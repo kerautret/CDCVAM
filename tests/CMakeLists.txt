@@ -1,4 +1,4 @@
-SET(TUBE_ANALYSE_TESTS
+SET(CDCVAM_TESTS
    testCenterLineHelper
    testGeodesicGraph
    testGeodesicGraphDisplay
@@ -10,15 +10,15 @@ SET(TUBE_ANALYSE_TESTS
 
 
 if ( USE_PCL )
-   SET( TUBE_ANALYSE_TESTS
-    ${TUBE_ANALYSE_TESTS}
+   SET( CDCVAM_TESTS
+    ${CDCVAM_TESTS}
     # ...
 )
 endif()
 
 
-FOREACH(FILE ${TUBE_ANALYSE_TESTS})
-  add_executable(${FILE} ${FILE} ${TUBE_ANALYSE_SRC_COMP})
+FOREACH(FILE ${CDCVAM_TESTS})
+  add_executable(${FILE} ${FILE} ${CDCVAM_SRC_COMP})
   target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} ${PCLLib})
 ENDFOREACH(FILE)
 

@@ -1,9 +1,8 @@
-
-PROJECT(TubeAnalyse)
+PROJECT(CDCVAM)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-SET(TUBE_ANALYSE_SRC_COMP
+SET(CDCVAM_SRC_COMP
  ${PROJECT_SOURCE_DIR}/src/GeodesicGraphComputer.cpp  
  ${PROJECT_SOURCE_DIR}/src/NormalAccumulator.cpp)
 
@@ -23,29 +22,20 @@ if ( Boost_FOUND )
      ${Boost_LIBRAIRIES}  
      ${Boost_PROGRAM_OPTIONS_LIBRARY})
    SET(DGtalLibInc ${Boost_INCLUDE_DIRS})
-endif( Boost_FOUND) 
+endif( Boost_FOUND )
 
 
 if ( USE_PCL )
+    SET(PCLLib ${PCL_SEGMENTATION_LIBRARIES})
     find_package(PCL 1.3 REQUIRED COMPONENTS common segmentation)
     include_directories(${PCL_INCLUDE_DIRS})
     link_directories(${PCL_LIBRARY_DIRS})
     add_definitions(${PCL_DEFINITIONS})
     add_definitions(-DUSE_PCL=${USE_PCL})
-endif()
-
-
-if ( USE_PCL )
-    SET(PCLLib ${PCL_SEGMENTATION_LIBRARIES})
 else ()
     SET(PCLLib "")
 endif()
 
 
-
-
 add_subdirectory(bin)
 add_subdirectory(tests)
-
-
-
