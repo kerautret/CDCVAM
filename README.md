@@ -7,8 +7,8 @@ Centerline Detection by Confidence Vote in Accumulation Map
 - CMake >= 2.6
 - Boost >= 1.46 (modules: program_options)
 - [DGtal](https://github.com/DGtal-team/DGtal)
-- [DGtalTools](https://github.com/DGtal-team/DGtalTools) : provide **3dImageViewer** and **3dSDPViewer** tools
-- [SGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib.git) : provide **graphViewer** tool
+- [DGtalTools](https://github.com/DGtal-team/DGtalTools) (optional) : provide **3dImageViewer** and **3dSDPViewer** tools
+- [DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib.git) (optional) : provide **graphViewer** tool
 
 ## Installation
 
