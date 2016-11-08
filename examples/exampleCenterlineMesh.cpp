@@ -45,7 +45,7 @@ int main(int argc, char *const *argv)
   
   P3d p0 = acc.getMaxAccumulationPoint();   
   
-  DGtal::trace.info() << "Starting point: " << startPoint << std::endl;
+  DGtal::trace.info() << "Starting point: " << p0 << std::endl;
   GeodesicGraphComputer gg(4, aConfidenceSet, 3,  acc.getDomain(), p0);
   gg.computeGraphFromGeodesic();
   
