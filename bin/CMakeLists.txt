@@ -1,7 +1,6 @@
 SET(CDCVAM_BIN
  centerLineGeodesicGraph
  compAccFromMesh
- compBallFromAccMesh 
  illustrationGraphAllSteps
  displayAccuMesh
  statisticsCC
