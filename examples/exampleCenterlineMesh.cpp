@@ -43,10 +43,10 @@ int main(int argc, char *const *argv)
       if(imageConfidence(p)>= 0.5)
           aConfidenceSet.insert(p);
   
-  P3d startPoint = acc.getMaxAccumulationPoint();   
+  P3d p0 = acc.getMaxAccumulationPoint();   
   
   DGtal::trace.info() << "Starting point: " << startPoint << std::endl;
-  GeodesicGraphComputer gg(4, aConfidenceSet, 3,  acc.getDomain(), startPoint);
+  GeodesicGraphComputer gg(4, aConfidenceSet, 3,  acc.getDomain(), p0);
   gg.computeGraphFromGeodesic();
   
   // export vertex
