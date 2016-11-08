@@ -179,7 +179,7 @@ int main(int argc, char *const *argv)
   GeodesicGraphComputer::TSet aConfidenceSet(imageConfidence.domain());
   for (auto const &p: imageConfidence.domain())
     {
-      if(imageConfidence(p)>=th && imageRadius(p) > 2 && imageAccumulation(p) > thAcc)
+      if(imageConfidence(p)>=th && imageAccumulation(p) > thAcc)
         {
           aConfidenceSet.insert(p);
         }      
