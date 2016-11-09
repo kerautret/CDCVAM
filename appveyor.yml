@@ -62,7 +62,7 @@ before_build:
 
 build_script:
   - echo %CONFIG%
-  - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% DGtalTools-contrib.sln 
+  - msbuild /m /p:Configuration=%CONFIG% /p:Platform=%B_NAME% CDCVAM.sln 
 
 # - ctest -D ExperimentalStart -C %CONFIG%
 # - ctest -D ExperimentalBuild -j2 -C %CONFIG%
