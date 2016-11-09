@@ -1,6 +1,16 @@
 # CDCVAM
 
-Centerline Detection by Confidence Vote in Accumulation Map
+##Source code of the papers:
+
+Centerline Detection on Partial Mesh Scans by Confidence Vote in Accumulation Map
+Bertrand Kerautret, Adrien Kraënbühl, Isabelle Debled-Rennesson and Jacques-Olivier Lachaud
+To appears at ICPR 2016
+
+
+
+Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
+
+Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
 
 ## Requires
 
@@ -53,4 +63,3 @@ graphViewer -m ../Samples/playmobiltree.off  -v playmobilTreeVertex.sdp -e playm
 ```
 
 
-Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
