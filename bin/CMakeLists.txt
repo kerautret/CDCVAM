@@ -3,11 +3,6 @@ SET(CDCVAM_BIN
  compAccFromMesh
  illustrationGraphAllSteps
  displayAccuMesh
- statisticsCC
- statisticsCentricity  
- statisticsRadiusErrDistr 
- statisticsRadiusErrEvol 
- statisticsRadiusEstim
 )
 
 
