@@ -13,12 +13,16 @@ LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 
+SET(Boost_USE_STATIC_LIBS   ON)
+SET(Boost_USE_MULTITHREADED ON)
+SET(Boost_USE_STATIC_RUNTIME OFF)
+SET(Boost_FOUND FALSE)
 
 FIND_PACKAGE(Boost 1.46.0 REQUIRED COMPONENTS program_options)
 if ( Boost_FOUND )
   message(STATUS "Boost and boost_program_options found.")
   include_directories( ${Boost_INCLUDE_DIRS} )
-      SET(DGtalToolsLibDependencies ${DGtalToolsLibDependencies} 
+      SET(CDCVAMLibDependencies ${CDCVAMLibDependencies} 
      ${Boost_LIBRAIRIES}  
      ${Boost_PROGRAM_OPTIONS_LIBRARY})
    SET(DGtalLibInc ${Boost_INCLUDE_DIRS})

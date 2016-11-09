@@ -16,7 +16,7 @@ endif()
 
 FOREACH(FILE ${CDCVAM_BIN})
   add_executable(${FILE} ${FILE} ${CDCVAM_SRC_COMP})
-  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${DGtalToolsLibDependencies} ${PCLLib})
+  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} ${PCLLib})
 ENDFOREACH(FILE)
 
 
