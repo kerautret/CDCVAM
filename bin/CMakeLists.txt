@@ -1,16 +1,8 @@
 SET(CDCVAM_BIN
- centerLineFMMc
  centerLineGeodesicGraph
  compAccFromMesh
-# compAccFromVol
- compBallFromAccMesh 
  illustrationGraphAllSteps
  displayAccuMesh
- statisticsCC
- statisticsCentricity  
- statisticsRadiusErrDistr 
- statisticsRadiusErrEvol 
- statisticsRadiusEstim
 )
 
 
