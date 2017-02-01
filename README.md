@@ -1,19 +1,37 @@
 # CDCVAM
 
-Centerline Detection by Confidence Vote in Accumulation Map
+##Source code of the papers:
 
-## Requires
+Centerline Detection on Partial Mesh Scans by Confidence Vote in Accumulation Map
+Bertrand Kerautret, Adrien Kraënbühl, Isabelle Debled-Rennesson and Jacques-Olivier Lachaud
+To appears at ICPR 2016
+
+
+
+Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
+
+Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
+
+## Dependencies
 
 - CMake >= 2.6
 - Boost >= 1.46 (modules: program_options)
+- PCL for the **compAccFromSDP** tool
 - [DGtal](https://github.com/DGtal-team/DGtal)
 - [DGtalTools](https://github.com/DGtal-team/DGtalTools) (optional) : provide **3dImageViewer** and **3dSDPViewer** tools
 - [DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib.git) (optional) : provide **graphViewer** tool
 
+Install dependencies CMake, Boost and PCL on Linux :
+```
+sudo apt-get install cmake libboost-dev libboost-program-options-dev libpcl-dev
+```
+
 ## Installation
 
+Option -DUSE_PCL=true is only required for the **compAccFromSDP** tool.
+
 1. mkdir build && cd build
-2. cmake ..
+2. cmake .. -DUSE_PCL=true
 3. make
 
 ## Use
@@ -53,4 +71,3 @@ graphViewer -m ../Samples/playmobiltree.off  -v playmobilTreeVertex.sdp -e playm
 ```
 
 
-Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
