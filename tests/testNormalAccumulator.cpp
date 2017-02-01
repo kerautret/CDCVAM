@@ -27,14 +27,14 @@ main(int argc,char **argv)
   ScaleFctD  confidencescale (0 , 1.0, 0, 1000);
   DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testConfidence.lvol",
                                                                                   acc.getConfidenceImage(),
-                                                                                  confidencescale);
+                                                                                  true, confidencescale);
 
   acc.computeRadiusFromOrigins();
   double maxRadius = acc.getMaxRadius();
   ScaleFctD  radiiScale (0 , maxRadius, 0, maxRadius * 1000);
   DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testRadius.lvol",
                                                                                   acc.getRadiusImage(),
-                                                                                  radiiScale);
+                                                                                  true, radiiScale);
   
   
 

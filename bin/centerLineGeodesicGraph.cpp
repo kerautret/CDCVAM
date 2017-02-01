@@ -156,7 +156,7 @@ int main(int argc, char *const *argv)
   ScaleFctD  confidencescale (0 , 1.0, 0, 255);
   DGtal::VolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportVol("confidence.vol",
                                                                           imageConfidence,
-                                                                          confidencescale);
+                                                                          true, confidencescale);
   if(vm.count("exportConfident")){
   
     std::string confExportName = vm["exportConfident"].as<std::string>();

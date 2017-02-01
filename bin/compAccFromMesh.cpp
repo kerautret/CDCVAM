@@ -111,7 +111,7 @@ int main(int argc, char *const *argv)
                  <<"  -> [0, 255]) image in " << outputFileAcc << " ... ";
     typedef functors::Rescaling<DGtal::uint64_t, unsigned char> ScaleFct;
     ScaleFct  scaleFct (0.0 ,normAcc.getMaxAccumulation(), 0, 255);
-    VolWriter<Image3D,ScaleFct>::exportVol(vm["autoScaleAcc"].as<std::string>(), imageAccumulation, scaleFct);
+    VolWriter<Image3D,ScaleFct>::exportVol(vm["autoScaleAcc"].as<std::string>(), imageAccumulation, true, scaleFct);
     trace.info() << "[done]" << std::endl;
   }
   
@@ -122,7 +122,7 @@ int main(int argc, char *const *argv)
   trace.info() << "Saving confidence image in " << outputFileConf << " ... ";
   typedef functors::Rescaling<double, DGtal::uint64_t> ScaleFctD;
   ScaleFctD scaleFct(0.0, 1.0, 0, vm["maxValOutConf"].as<DGtal::uint64_t>());
-  LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileConf, imageConfidence, scaleFct);
+  LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileConf, imageConfidence, true, scaleFct);
   trace.info() << "[done]" << std::endl;
   
   if(vm.count("autoScaleConf"))
@@ -131,7 +131,7 @@ int main(int argc, char *const *argv)
       trace.info() << "Saving confidence (auto scale 0 1 -> 0 255) image in " << outNameAutoConfidence << " ... ";
       typedef functors::Rescaling<double, unsigned char> ScaleFctD;
       ScaleFctD  scaleFct (0.0 ,1.0, 0, 255);
-      VolWriter<ImageDouble,ScaleFctD>::exportVol(outNameAutoConfidence, imageConfidence, scaleFct);
+      VolWriter<ImageDouble,ScaleFctD>::exportVol(outNameAutoConfidence, imageConfidence, true, scaleFct);
       trace.info() << "[done]" << std::endl;    
     }
   
@@ -141,7 +141,7 @@ int main(int argc, char *const *argv)
   ImageDouble imageRadius = normAcc.getRadiusImage();  
   trace.info() << "Saving radius image in " << outputFileRad << " ... ";
   ScaleFctD scaleFct2(0.0, normAcc.getMaxRadius(), 0, vm["maxValOutRad"].as<DGtal::uint64_t>());
-  LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileRad, imageRadius, scaleFct2);
+  LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileRad, imageRadius, true, scaleFct2);
   trace.info() << "[done]" << std::endl;
  if(vm.count("autoScaleRad"))
     {
@@ -150,7 +150,7 @@ int main(int argc, char *const *argv)
                    << " ->[0,255]) image in " << outNameAutoRadius << " ... ";
       typedef functors::Rescaling<double, unsigned char> ScaleFctD;
       ScaleFctD  scaleFct (0.0 ,normAcc.getMaxRadius(), 0, 255);
-      VolWriter<ImageDouble,ScaleFctD>::exportVol(outNameAutoRadius, imageRadius, scaleFct);
+      VolWriter<ImageDouble,ScaleFctD>::exportVol(outNameAutoRadius, imageRadius, true, scaleFct);
       trace.info() << "[done]" << std::endl;    
     }    
   return 0;
