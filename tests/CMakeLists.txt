@@ -1,11 +1,14 @@
 SET(CDCVAM_TESTS
    testCenterLineHelper
    testGeodesicGraph
-   testGeodesicGraphDisplay
    testGeodesicGraphVertexRepr
    testNormalAccumulator
    testNormalAccumulatorNormals
 )
+
+if (  WITH_VISU3D_QGLVIEWER )
+   SET(CDCVAM_TESTS ${CDCVAM_TESTS} testGeodesicGraphDisplay)
+endif ( WITH_VISU3D_QGLVIEWER )  
 
 
 
