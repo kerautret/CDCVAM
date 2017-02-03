@@ -17,7 +17,8 @@ Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k
 - CMake >= 2.6
 - Boost >= 1.46 (modules: program_options)
 - PCL for the **compAccFromSDP** tool
-- [DGtal](https://github.com/DGtal-team/DGtal) (optional with QGLViewer to have 3D display tools: illustrationGraphAllSteps and testGeodesicGraphDisplay)
+- [DGtal](https://github.com/DGtal-team/DGtal) 
+   (eventually with QGLViewer to have 3D display tools: illustrationGraphAllSteps and testGeodesicGraphDisplay)
 - [DGtalTools](https://github.com/DGtal-team/DGtalTools) (optional) : provide **3dImageViewer** and **3dSDPViewer** tools
 - [DGtalTools-contrib](https://github.com/DGtal-team/DGtalTools-contrib.git) (optional) : provide **graphViewer** tool
 
