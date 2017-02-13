@@ -70,5 +70,8 @@ The computed graph can be visualized using the **graphViewer** from the DGtalToo
 ```
 graphViewer -m ../Samples/playmobiltree.off  -v playmobilTreeVertex.sdp -e playmobilTreeEdges.sdp --meshColor 200 200 200 125 --edgeColor 200 50 50 255 -b 0.5
 ```
-
+You should obtain:
+<br>
+<center><img width="313" alt="capture d ecran 2017-02-09 a 20 33 29" src="https://cloud.githubusercontent.com/assets/772865/22905672/726ffe62-f241-11e6-8e0b-76994bfb0b79.png">
+</center>
 
