@@ -10,20 +10,19 @@ endif ( WITH_VISU3D_QGLVIEWER )
 
 
 if ( USE_PCL )
-    SET( CDCVAM_BIN_PCL
-    ${CDCVAM_BIN_PCL}
+    SET( CDCVAM_BIN
+    ${CDCVAM_BIN}
     compAccFromSDP )
 endif()
 
 
-FOREACH(FILE ${CDCVAM_BIN_PCL})
-  add_executable(${FILE} ${FILE} ${CDCVAM_SRC_COMP})
-  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} ${PCLLib})
-ENDFOREACH(FILE)
-
 FOREACH(FILE ${CDCVAM_BIN})
   add_executable(${FILE} ${FILE} ${CDCVAM_SRC_COMP})
-  target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies})
+  if ( USE_PCL )           
+    target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} ${PCLLib})
+  else ()
+    target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} )
+  endif( USE_PCL )  
 ENDFOREACH(FILE)
 
 
