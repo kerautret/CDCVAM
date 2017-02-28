@@ -128,7 +128,7 @@ public:
 
 
 
-  void initFromPointCloud(const std::vector<Point> &aVectPoints, const unsigned int nbNeighbohr = 10.0);
+  void initFromPointCloud(const std::vector<Point> &aVectPoints, const unsigned int nbNeighbohr = 10);
 
 
 #endif
