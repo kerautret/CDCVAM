@@ -13,7 +13,7 @@ FOREACH(FILE ${CDCVAM_TOOLS})
   if ( USE_PCL )
     target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} ${PCLLib})
   else ()
-    arget_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} )
+    target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} )
   endif( USE_PCL )
 ENDFOREACH(FILE)
 
