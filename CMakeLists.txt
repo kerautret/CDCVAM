@@ -6,9 +6,17 @@ SET(CDCVAM_SRC_COMP
  ${PROJECT_SOURCE_DIR}/src/GeodesicGraphComputer.cpp  
  ${PROJECT_SOURCE_DIR}/src/NormalAccumulator.cpp)
 
-FIND_PACKAGE(DGtal REQUIRED)
+
+
+message(STATUS "-------------------------------------------------------------------------------")
+message(STATUS "Checking if DGtal is installed:")
+FIND_PACKAGE(DGtal 0.9.3 REQUIRED)
 INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+message(STATUS "DGtal found.")
+
+
 
 
 include_directories ("${PROJECT_SOURCE_DIR}/src")

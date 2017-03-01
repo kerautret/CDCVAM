@@ -23,7 +23,13 @@ FOREACH(FILE ${CDCVAM_BIN})
   else ()
     target_link_libraries (${FILE} ${DGTAL_LIBRARIES} ${CDCVAMLibDependencies} )
   endif( USE_PCL )  
+  install(TARGETS ${FILE}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+
 ENDFOREACH(FILE)
+
 
 
 
