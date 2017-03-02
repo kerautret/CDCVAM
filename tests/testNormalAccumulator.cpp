@@ -12,7 +12,7 @@ main(int argc,char **argv)
 {
 
   DGtal::Mesh<DGtal::Z3i::RealPoint>  aMesh;
-  aMesh << "../Samples2/bk7.off";
+  aMesh << "../Samples/lemontree.off";
   NormalAccumulator acc(12);
   acc.initFromMesh(aMesh);
 
