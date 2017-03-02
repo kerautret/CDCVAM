@@ -14,7 +14,7 @@ main(int argc,char **argv)
   DGtal::Mesh<DGtal::Z3i::RealPoint>  aMesh;
   aMesh << "../Samples/lemontree.off";
   NormalAccumulator acc(12);
-  acc.initFromMesh(aMesh);
+  acc.initFromMesh(aMesh, true);
 
   acc.computeAccumulation();
   DGtal::LongvolWriter<NormalAccumulator::Image3D>::exportLongvol("testAccumulation.lvol",
