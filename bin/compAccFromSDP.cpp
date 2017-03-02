@@ -69,6 +69,7 @@ int main(int argc, char *const *argv)
   ("neighborhoodDistance,d",po::value<double>(), "use a neighborhood distance to estimate the normals." )
   ("neighborhoodNum,n",po::value<unsigned int>(), "set a number of neighbors to define the neighborhood to estimate the normals." )
   ("exportNormal,e", po::value<std::string>()->default_value("normalPCL.sdp"), "export normals estimated from PCL.")
+  ("exportPointAssociations", po::value<unsigned int>(), "export in sdp (voxelAssos.sdp) the associated points contributing to the accumulation score (for voxels with score < threshold). Each pair point of the association are exported sequentially.")
   ("radius,r", po::value<double>()->default_value(5), "radius of accumulation analysis.")
   ("maxValOutConf", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of confidence out image: 0 .. 1 -> 0 ..  MAX.")
   ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
@@ -203,6 +204,26 @@ int main(int argc, char *const *argv)
       VolWriter<ImageDouble,ScaleFctD>::exportVol(outNameAutoRad, imageRadius, true, scaleFct);
       trace.info() << "[done]" << std::endl;    
     }      
-  return 0;
+
+ if(vm.count("exportPointAssociations"))
+   {
+     std::ofstream outAssociations;
+     outAssociations.open("voxelAssos.sdp");     
+     unsigned int th = vm["exportPointAssociations"].as<unsigned int>();
+     for( const auto &p: imageAccumulation.domain())
+       {
+         if (imageAccumulation(p)>th)
+           {
+             outAssociations << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
+             NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
+             for(const auto & pa: neighbors)
+               {
+                 outAssociations << p[0] << " " << p[1] << " " << p[2] << std::endl;
+                 outAssociations << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
+               }
+           }         
+       }
+   }
+ return 0;
 }
 
