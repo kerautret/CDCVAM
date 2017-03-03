@@ -63,7 +63,6 @@ int main(int argc, char *const *argv)
   ("outputAcc,o", po::value<std::string>()->default_value("accumulation.vol"), "output accumulation vol file.")
   ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
   ("outputRad,R", po::value<std::string>()->default_value("radius.vol"), "output radius vol file.")  
-  ("invertNormal", "invert input normal.")
   ("radiusEstimator,e", po::value<std::string>()->default_value("min"),  "use: {min (default), max, mean, median} to estimate the radius") 
       
   ("neighborhoodDistance,d",po::value<double>(), "use a neighborhood distance to estimate the normals." )
@@ -104,7 +103,7 @@ int main(int argc, char *const *argv)
   string outputFileConf = vm["outputConf"].as<std::string>();
 
   string typeStat = vm["radiusEstimator"].as<string>();
-  bool invertNormal = vm.count("invertNormal");
+
 
   DGtal::uint64_t outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
   DGtal::uint64_t outRadiusMax = vm["maxValOutRad"].as<DGtal::uint64_t>();

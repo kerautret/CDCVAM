@@ -112,8 +112,8 @@ public:
    * 
    **/
 
-  void initFromNormals(const std::vector<DGtal::Z3i::RealPoint> aSetOfPoints,
-                       const std::vector<DGtal::Z3i::RealPoint> aSetOfNormals,
+  void initFromNormals(const std::vector<DGtal::Z3i::RealPoint> &aSetOfPoints,
+                       const std::vector<DGtal::Z3i::RealPoint> &aSetOfNormals,
                        const bool invertNormal);
   
   /**
