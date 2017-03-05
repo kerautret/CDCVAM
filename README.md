@@ -12,6 +12,8 @@ Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?t
 
 Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a4e66031f4e4058bad43e440c464e11)](https://www.codacy.com/app/kerautret/CDCVAM?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kerautret/CDCVAM&amp;utm_campaign=Badge_Grade)
+
 ## Dependencies
 
 - CMake >= 2.6
