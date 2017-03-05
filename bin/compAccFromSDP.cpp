@@ -152,7 +152,6 @@ int main(int argc, char *const *argv)
     std::ofstream outNormals;
     string normalSegFileName = vm["exportNormals"].as<std::string>();
     outNormals.open(normalSegFileName);
-    double scaleV = 2.0;
     std::vector<Z3i::RealPoint> vNormals = normAcc.getNormalField();
     for (unsigned int i = 0; i < vNormals.size() ; i++) {
       Z3i::RealPoint n = vNormals[i].getNormalized();
