@@ -31,7 +31,7 @@ main(int argc,char **argv)
   }
   GeodesicGraphComputer gg(3.0, aSet, 2.0, d, Z3i::Point(531, 425, 302));
   gg.computeGraphFromGeodesic();
-
+  DGtal::trace.info() << "max geodesic distance: " << gg.getMaxGeodesDistance() << std::endl;
   // Export dilatation
   GeodesicGraphComputer::TSet dilateSet = gg.getDilatedSet();  
   std::ofstream resDilate;

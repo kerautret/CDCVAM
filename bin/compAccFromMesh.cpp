@@ -55,7 +55,6 @@ int main(int argc, char *const *argv)
     ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255),
      "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
     ("autoScaleAcc", po::value<std::string>(), "auto scale out accumulation image values between 0 and 255.")
-    ("autoScaleRad", po::value<std::string>(), "auto scale out radius image values between 0 and 255.")
     ("autoScaleConf", po::value<std::string>(), "auto scale out condidence image values between 0 and 255.")
     ("radius,r", po::value<double>()->default_value(5), "radius of accumulation analysis.");
   
@@ -87,8 +86,7 @@ int main(int argc, char *const *argv)
   
   string typeStat = vm["radiusEstimator"].as<string>();
   bool invertNormal = vm.count("invertNormal");
-  unsigned int outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
-  unsigned int outRadiusMax = vm["maxValOutRad"].as<DGtal::uint64_t>();
+  
   
   // 1) Reading input mesh
   Mesh<Z3i::RealPoint> aMesh(true);

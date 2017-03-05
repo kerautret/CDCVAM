@@ -61,7 +61,7 @@ public:
    **/
 
   NormalAccumulator(const double aRadius,
-                    const std::string rEstimDef = "min"): myRadius(aRadius), 
+                    const std::string &rEstimDef = "min"): myRadius(aRadius), 
                                                           myAccumulationImage(DGtal::Z3i::Domain()),
                                                           myConfidenceImage(DGtal::Z3i::Domain()),
                                                           myRadiusImage(DGtal::Z3i::Domain()),
@@ -112,9 +112,9 @@ public:
    * 
    **/
 
-  void initFromNormals(const std::vector<DGtal::Z3i::RealPoint> aSetOfPoints,
-                       const std::vector<DGtal::Z3i::RealPoint> aSetOfNormals,
-                       const bool invertNormal);
+  void initFromNormals(const std::vector<DGtal::Z3i::RealPoint> &aSetOfPoints,
+                       const std::vector<DGtal::Z3i::RealPoint> &aSetOfNormals,
+                       const bool invertNormal=false);
   
   /**
    * @todo with testing if PCL is installed

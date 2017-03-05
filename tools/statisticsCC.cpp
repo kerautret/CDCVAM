@@ -70,7 +70,6 @@ template<typename TImage>
 unsigned int
 computeCC_UF(const TImage &image, typename TImage::Value th )
 {
-  std::vector<int>  parent;
   Z3i::Domain dom = image.domain();
   Image3DPoint imageParent (dom);
   for( const auto &p: dom ) imageParent.setValue(p, p);

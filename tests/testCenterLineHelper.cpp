@@ -56,7 +56,6 @@ int main(int argc, char *const *argv)
 
 
   std::string inputMeshName = "test.off";
-  std::string outputName = "resTestCenterLineHelper.sdp";
 
   double dilateDist = 2.0;
   double th = 0.5;

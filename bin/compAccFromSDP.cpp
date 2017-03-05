@@ -63,13 +63,15 @@ int main(int argc, char *const *argv)
   ("outputAcc,o", po::value<std::string>()->default_value("accumulation.vol"), "output accumulation vol file.")
   ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
   ("outputRad,R", po::value<std::string>()->default_value("radius.vol"), "output radius vol file.")  
-  ("invertNormal", "invert input normal.")
   ("radiusEstimator,e", po::value<std::string>()->default_value("min"),  "use: {min (default), max, mean, median} to estimate the radius") 
       
   ("neighborhoodDistance,d",po::value<double>(), "use a neighborhood distance to estimate the normals." )
   ("neighborhoodNum,n",po::value<unsigned int>(), "set a number of neighbors to define the neighborhood to estimate the normals." )
-  ("exportNormal,e", po::value<std::string>()->default_value("normalPCL.sdp"), "export normals estimated from PCL.")
-  ("exportPointAssociations", po::value<unsigned int>(), "export in sdp (voxelAssos.sdp) the associated points contributing to the accumulation score (for voxels with score < threshold). Each pair point of the association are exported sequentially.")
+
+  ("exportNormalSegments", po::value<std::string>()->default_value("normalPCL.sdp"), "export normal segments estimated from PCL (extremity of normals vectors).")
+  ("exportNormals", po::value<std::string>()->default_value("normalSegPCL.normals"), "export normals estimated from PCL (unit vectors).")
+
+    ("exportPointAssociations", po::value<unsigned int>(), "export in sdp (voxelAssos.sdp) the associated points contributing to the accumulation score (for voxels with score < threshold). Each pair point of the association are exported sequentially.")
   ("radius,r", po::value<double>()->default_value(5), "radius of accumulation analysis.")
   ("maxValOutConf", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of confidence out image: 0 .. 1 -> 0 ..  MAX.")
   ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
@@ -104,7 +106,7 @@ int main(int argc, char *const *argv)
   string outputFileConf = vm["outputConf"].as<std::string>();
 
   string typeStat = vm["radiusEstimator"].as<string>();
-  bool invertNormal = vm.count("invertNormal");
+
 
   DGtal::uint64_t outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
   DGtal::uint64_t outRadiusMax = vm["maxValOutRad"].as<DGtal::uint64_t>();
@@ -131,10 +133,10 @@ int main(int argc, char *const *argv)
   
   
   // 3) check if export
-  if(vm.count("exportNormal")){
+  if(vm.count("exportNormalSegments")){
     std::ofstream outNormals;
-    string normalFileName = vm["exportNormal"].as<std::string>();
-    outNormals.open(normalFileName);
+    string normalSegFileName = vm["exportNormalSegments"].as<std::string>();
+    outNormals.open(normalSegFileName);
     double scaleV = 2.0;
     std::vector<Z3i::RealPoint> vPts = normAcc.getNormalOrigins();
     std::vector<Z3i::RealPoint> vNormals = normAcc.getNormalField();
@@ -142,6 +144,18 @@ int main(int argc, char *const *argv)
       outNormals << vPts[i][0] << " " << vPts[i][1] << " "<< vPts[i][2] << std::endl;
       outNormals <<vPts[i][0]+vNormals[i][0]*scaleV << " "<<vPts[i][1]+vNormals[i][1]*scaleV  
                  << " "<< vPts[i][2]+vNormals[i][2]*scaleV << std::endl;
+    }  
+    outNormals.close();
+  }
+
+  if(vm.count("exportNormals")){
+    std::ofstream outNormals;
+    string normalSegFileName = vm["exportNormals"].as<std::string>();
+    outNormals.open(normalSegFileName);
+    std::vector<Z3i::RealPoint> vNormals = normAcc.getNormalField();
+    for (unsigned int i = 0; i < vNormals.size() ; i++) {
+      Z3i::RealPoint n = vNormals[i].getNormalized();
+      outNormals << n[0] << " " << n[1] << " "<< n[2] << std::endl;
     }  
     outNormals.close();
   }
