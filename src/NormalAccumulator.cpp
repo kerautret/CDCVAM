@@ -133,7 +133,8 @@ NormalAccumulator::initFromMeshAndNormals(const DGtal::Mesh<Point> &aMesh,
 
 void
 NormalAccumulator::initFromNormals(const std::vector<DGtal::Z3i::RealPoint> &aSetOfPoints,
-                                   const std::vector<DGtal::Z3i::RealPoint> &aSetOfNormals, const bool invertNormal)
+                                   const std::vector<DGtal::Z3i::RealPoint> &aSetOfNormals,
+                                   const bool invertNormal)
 {
   // Simply insert input points and normals.
   if (myIsVerbose)
