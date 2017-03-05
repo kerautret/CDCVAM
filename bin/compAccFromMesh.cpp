@@ -86,7 +86,6 @@ int main(int argc, char *const *argv)
   
   string typeStat = vm["radiusEstimator"].as<string>();
   bool invertNormal = vm.count("invertNormal");
-  unsigned int outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
   
   
   // 1) Reading input mesh

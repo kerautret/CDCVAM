@@ -24,6 +24,10 @@ main(int argc,char **argv)
   acc.computeConfidence();
   typedef DGtal::functors::Rescaling< double, DGtal::uint64_t> ScaleFctD;
 
+  DGtal::trace.info() <<"max radius point:"<<  acc.getMaxRadiusPoint();
+  DGtal::trace.info() <<"max accumulation point:"<<  acc.getMaxAccumulationPoint() ;
+  DGtal::trace.info() <<"max accumulation point:"<<  acc.getDomain() ;
+
   ScaleFctD  confidencescale (0 , 1.0, 0, 1000);
   DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testConfidence.lvol",
                                                                                   acc.getConfidenceImage(),
