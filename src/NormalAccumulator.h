@@ -124,7 +124,8 @@ public:
 
 
 
-  void initFromPointCloud(const std::vector<Point> &aVectPoints, const double size=5.0);
+  void initFromPointCloud(const std::vector<Point> &aVectPoints, const double size=5.0,
+                          bool autoOrient=true);
 
 
 

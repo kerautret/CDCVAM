@@ -77,7 +77,8 @@ int main(int argc, char *const *argv)
   ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
   ("autoScaleRad", po::value<std::string>(), "auto scale out radius image values between 0 and 255.")
   ("autoScaleConf", po::value<std::string>(), "auto scale out confidence image values between 0 and 255.")
-  ("autoScaleAcc", po::value<std::string>(), "auto scale out accumulation image values between 0 and 255.");
+  ("autoScaleAcc", po::value<std::string>(), "auto scale out accumulation image values between 0 and 255.")
+  ("forceNoAutoOrient", "force to not auto orient the normals vector (not recommanded).");
   
   bool parseOK = true;
   po::variables_map vm;
@@ -104,9 +105,9 @@ int main(int argc, char *const *argv)
   string outputFileAcc = vm["outputAcc"].as<std::string>();
   string outputFileRad = vm["outputRad"].as<std::string>();
   string outputFileConf = vm["outputConf"].as<std::string>();
-
   string typeStat = vm["radiusEstimator"].as<string>();
-
+  bool forceNoAutoOrient = vm.count("forceNoAutoOrient")!=0;
+  
 
   DGtal::uint64_t outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
   DGtal::uint64_t outRadiusMax = vm["maxValOutRad"].as<DGtal::uint64_t>();
@@ -124,7 +125,7 @@ int main(int argc, char *const *argv)
   NormalAccumulator normAcc(radius, typeStat);
   if(vm.count("neighborhoodDistance")){
     double d = vm["neighborhoodDistance"].as<double>();
-    normAcc.initFromPointCloud(setOfPt, d);
+    normAcc.initFromPointCloud(setOfPt, d, !forceNoAutoOrient);
   }else{
     //ne.setKSearch(vm["neighborhoodNum"].as<unsigned int>());
     trace.error() << "you need to use either --neighborhoodDistance or --neighborhoodNum options" << std::endl; 

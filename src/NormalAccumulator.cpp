@@ -189,7 +189,7 @@ NormalAccumulator::initFromNormals(const std::vector<DGtal::Z3i::RealPoint> &aSe
 
 void 
 NormalAccumulator::initFromPointCloud(const std::vector<Point> &aVectPoints,
-                                      const double size)
+                                      const double size, const bool autoOrient)
 {
   myNormalOrigins = aVectPoints;
   // prepare cloud points
@@ -212,8 +212,9 @@ NormalAccumulator::initFromPointCloud(const std::vector<Point> &aVectPoints,
                                            (*cloud_normals)[i].normal_y,
                                            (*cloud_normals)[i].normal_z));
   }  
-  myDomain = AccumulatorHelper::orientNormalsFromAcc(myNormalOrigins, myNormalField, myRadius);
-
+  if(autoOrient){
+    myDomain = AccumulatorHelper::orientNormalsFromAcc(myNormalOrigins, myNormalField, myRadius);
+  }
   myAccumulationImage = NormalAccumulator::Image3D(myDomain);
   myConfidenceImage = NormalAccumulator::Image3DDouble(myDomain);
   myRadiusImage = NormalAccumulator::Image3DDouble(myDomain);
