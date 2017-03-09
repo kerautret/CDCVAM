@@ -17,7 +17,7 @@ main(int argc,char **argv)
   acc.initFromMesh(aMesh, true);
 
   acc.computeAccumulation();
-  DGtal::LongvolWriter<NormalAccumulator::Image3D>::exportLongvol("testAccumulation.lvol",
+  DGtal::LongvolWriter<NormalAccumulator::Image3D>::exportLongvol("testAccumulation.longvol",
                                                                   acc.getAccumulationImage());
 
   DGtal::trace.info() << acc;
@@ -29,14 +29,14 @@ main(int argc,char **argv)
   DGtal::trace.info() <<"max accumulation point:"<<  acc.getDomain() ;
 
   ScaleFctD  confidencescale (0 , 1.0, 0, 1000);
-  DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testConfidence.lvol",
+  DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testConfidence.longvol",
                                                                                   acc.getConfidenceImage(),
                                                                                   true, confidencescale);
 
   acc.computeRadiusFromOrigins();
   double maxRadius = acc.getMaxRadius();
   ScaleFctD  radiiScale (0 , maxRadius, 0, maxRadius * 1000);
-  DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testRadius.lvol",
+  DGtal::LongvolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportLongvol("testRadius.longvol",
                                                                                   acc.getRadiusImage(),
                                                                                   true, radiiScale);
   
