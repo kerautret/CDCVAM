@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <fstream>
 
 
 #include "DGtal/helpers/StdDefs.h"
@@ -47,6 +49,10 @@ int main(int argc, char *const *argv)
     ("outputAcc,o", po::value<std::string>()->default_value("accumulation.longvol"), "output accumulation longvol file.")
     ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
     ("outputRad,R", po::value<std::string>()->default_value("radius.longvol"), "output radius vol file.")
+    ("outputAccVectors", po::value<std::string>(), "export the accumulation vectors.")
+    ("outputConfVectors", po::value<std::string>(), "export the confidence vectors.")
+    ("maxThAccVectors", po::value<unsigned int>()->default_value(50), "threshold the value of accumulations to export the accumulations vectors (used with outputAccVectors) .")
+    ("maxThConfVectors", po::value<double>()->default_value(0.75), "threshold the value of confidence to export the accumulations vectors (used with outputConfVectors) .")
     ("invertNormal", "invert input normal.")
     ("radiusEstimator,e", po::value<std::string>()->default_value("min"), 
      "use: {min (default), max, mean, median} to estimate the radius") 
@@ -112,7 +118,32 @@ int main(int argc, char *const *argv)
     VolWriter<Image3D,ScaleFct>::exportVol(vm["autoScaleAcc"].as<std::string>(), imageAccumulation, true, scaleFct);
     trace.info() << "[done]" << std::endl;
   }
-  
+
+  // 3bis) Optionally export the vectors of the accumulation
+ if(vm.count("outputAccVectors"))
+   {
+     std::string outName = vm["outputAccVectors"].as<std::string>();
+     ofstream fout; fout.open(outName.c_str(), ofstream::binary|ofstream::out);
+     unsigned int thAcc = vm["maxThAccVectors"].as<unsigned int>();
+     for(const auto &p: imageAccumulation.domain())
+       {
+         if(imageAccumulation(p)>thAcc)
+           {
+             NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
+             if(setPt.size()!=0){
+               fout << p[0] << " " << p[1] << " " << p[2] << " " ;
+               for(const auto &n: setPt)
+                 {
+                   Z3i::RealPoint v = p-n;
+                   fout << v[0] << " " << v[1] << " " << v[2] << " "; 
+                 }
+               fout << std::endl;
+             }
+           }
+       }
+     fout.close();
+   }
+     
   
   // 4) Compute confidence image 
   normAcc.computeConfidence();
@@ -151,6 +182,35 @@ int main(int argc, char *const *argv)
       VolWriter<ImageDouble,ScaleFctD>::exportVol(outNameAutoRadius, imageRadius, true, scaleFct);
       trace.info() << "[done]" << std::endl;    
     }    
-  return 0;
+
+
+ // 5 bis) Optionally export the vectors of the confidence
+ if(vm.count("outputConfVectors"))
+   {
+     std::string outName = vm["outputConfVectors"].as<std::string>();
+     ofstream fout; fout.open(outName.c_str(), ofstream::binary|ofstream::out);
+     double thConf = vm["maxThConfVectors"].as<double>();
+     for(const auto &p: imageAccumulation.domain())
+       {
+         if(imageConfidence(p)>thConf)
+           {
+             NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
+             if(setPt.size()!=0){
+               fout << p[0] << " " << p[1] << " " << p[2] << " " ;
+               for(const auto &n: setPt)
+                 {
+                   DGtal::Z3i::RealPoint v = p-n;
+                   fout << v[0] << " " << v[1] << " " << v[2] << " "; 
+                 }
+               fout << std::endl;
+             }
+
+           }
+       }
+     fout.close();
+   }
+   
+ 
+ return 0;
 }
 
