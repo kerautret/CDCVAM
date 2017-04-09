@@ -199,7 +199,7 @@ int main(int argc, char *const *argv)
                fout << p[0] << " " << p[1] << " " << p[2] << " " ;
                for(const auto &n: setPt)
                  {
-                   DGtal::Z3i::RealPoint v = p-n;
+                   Z3i::RealPoint v = p-n;
                    fout << v[0] << " " << v[1] << " " << v[2] << " "; 
                  }
                fout << std::endl;
