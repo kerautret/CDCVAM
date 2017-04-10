@@ -74,7 +74,8 @@ DGtal::Z3i::RealPoint getMainDirsCoVar(const std::vector<DGtal::Z3i::RealPoint> 
 
 
 
-DGtal::Z3i::RealPoint getMainDirsAlgoLast(const std::vector<DGtal::Z3i::RealPoint> &accVect)
+DGtal::Z3i::RealPoint getMainDirsAlgoLast(const std::vector<DGtal::Z3i::RealPoint> &accVect,
+                                          double minSinAngle)
 {
   DGtal::Z3i::RealPoint lastDir;
   DGtal::Z3i::RealPoint mainDir (0, 0, 0);
@@ -84,27 +85,27 @@ DGtal::Z3i::RealPoint getMainDirsAlgoLast(const std::vector<DGtal::Z3i::RealPoin
     {
       if(!first)
         {
-          DGtal::Z3i::RealPoint d = lastDir.crossProduct(v);
+          DGtal::Z3i::RealPoint d = lastDir.crossProduct(v.getNormalized());
           if(mainDir != DGtal::Z3i::RealPoint(0,0,0) && d.dot(mainDir)<0){
             d *=-1.0;
           }
-          // if(d.norm()>0.1){
+          if(d.norm()>minSinAngle){
             mainDir += d;
             num++;
-            //}
+          }
         }
       else
         {
           first = false;
         }
-      lastDir = v;
+      lastDir = v.getNormalized();
     }
 
   if (num !=0)
     {
       return mainDir.getNormalized();      
     }
-  return mainDir.getNormalized();
+  return mainDir;
 }
 
   
@@ -121,6 +122,7 @@ int main(int argc, char **argv)
     ("input,i", po::value<std::string >(), "an input file representing the accumulating vectors which contribute in a voxel (format X Y Z V0x V0y V0z V1x V1y V1z ... . " )
     ("scale,s", po::value<double >()->default_value(2.0), "set the scale of the resultng vectors (ie. length of vector). " )
     ("useCovariance", "use covariance analysis")
+    ("minAngle",po::value<double >()->default_value(0.01),  "minimal angle to consider two directions equals (used when useCovariance is not selected).")
     ("output,o", po::value<std::string>()->default_value("outMainDir.sdp"), "the resulting main dir vectors " );
   
   bool parseOK=true;
@@ -141,9 +143,10 @@ int main(int argc, char **argv)
   if( !parseOK || vm.count("help")||argc<=1)
     {
       std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "The tools description... \n"
+                << "It computes the main tube direction from the vectors contributing in the accumulation/confidence. \n"
+                << "Two methods are proposed from the algorithm of accumulation and from the covariance matrix (with option useCovariance). \n"
                 << general_opt << "\n"
-                << "Typical use example:\n \t XXX -i ... \n";
+                << "Typical use example:\n \t compMainDirs -i contribVect.sdp    -o vFieldCoVariance.sdp --useCovariance \n";
       return 0;
     }  
   if(! vm.count("input"))
@@ -156,9 +159,10 @@ int main(int argc, char **argv)
   //  recover the  args ----------------------------------------------------
   string inputFileName = vm["input"].as<string>();
   string outputFileName =  vm["output"].as<string>();
-
+  double minSinAngle = sin(vm["minAngle"].as<double>());
+                           
   // Reading input file
-  trace.info() << "Reading input vectors...";
+    trace.info() << "Reading input vectors...";
   std::vector<std::vector<double > > vectAccDirs =
     TableReader<double>::getLinesElementsFromFile(inputFileName);
   trace.info()<< "[Done]"<<std::endl;
@@ -184,14 +188,13 @@ int main(int argc, char **argv)
               md = getMainDirsCoVar(listV);
             }
           else{
-             md = getMainDirsAlgoLast(listV);
+            md = getMainDirsAlgoLast(listV, minSinAngle);
           }
           if(md != Z3i::RealPoint(0,0,0))
             {
               vd.mainDir = md;
               result.push_back(vd);
             }
-
         } 
     }
 
@@ -202,8 +205,7 @@ int main(int argc, char **argv)
   for(const auto  &vd: result)
     {
       fout << vd.pt[0] << " " << vd.pt[1] << " " << vd.pt[2] << " "
-           << vd.pt[0]+vd.mainDir[0]*scale <<  " " << vd.pt[1]+vd.mainDir[1]*scale << " " << vd.pt[2]+vd.mainDir[2]*scale << std::endl; 
-      
+           << vd.pt[0]+vd.mainDir[0]*scale <<  " " << vd.pt[1]+vd.mainDir[1]*scale << " " << vd.pt[2]+vd.mainDir[2]*scale << std::endl;       
     }
   fout.close();
   return 0;
