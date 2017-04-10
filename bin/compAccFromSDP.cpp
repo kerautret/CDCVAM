@@ -223,26 +223,6 @@ int main(int argc, char *const *argv)
      fout.close();
    }
 
-  if(vm.count("exportPointAssociationsAcc"))
-   {
-     std::ofstream outAssociations;
-     outAssociations.open("voxelAssosAcc.sdp");     
-     unsigned int th = vm["exportPointAssociationsAcc"].as<unsigned int>();
-     for( const auto &p: imageAccumulation.domain())
-       {
-         if (imageAccumulation(p)>th)
-           {
-             outAssociations << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
-             NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
-             for(const auto & pa: neighbors)
-               {
-                 outAssociations << p[0] << " " << p[1] << " " << p[2] << std::endl;
-                 outAssociations << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
-               }
-           }         
-       }
-   }
-
   // 4) Compute confidence image 
   normAcc.computeConfidence();
   ImageDouble imageConfidance = normAcc.getConfidenceImage();
@@ -281,25 +261,6 @@ int main(int argc, char *const *argv)
       trace.info() << "[done]" << std::endl;    
     }      
 
-  if(vm.count("exportPointAssociationsConf"))
-   {
-     std::ofstream outAssociations;
-     outAssociations.open("voxelAssosAcc.sdp");     
-     unsigned int th = vm["exportPointAssociationsConf"].as<double>();
-     for( const auto &p: imageAccumulation.domain())
-       {
-         if (imageConfidance(p)>th)
-           {
-             outAssociations << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
-             NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
-             for(const auto & pa: neighbors)
-               {
-                 outAssociations << p[0] << " " << p[1] << " " << p[2] << std::endl;
-                 outAssociations << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
-               }
-           }         
-       }
-   }
 
  // 5 bis) Optionally export the vectors of the confidence
  if(vm.count("outputConfVectors"))
