@@ -58,27 +58,30 @@ int main(int argc, char *const *argv)
 {
   po::options_description general_opt("Allowed options are: ");
   general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "input sdp points (x y z format).")
-  ("outputAcc,o", po::value<std::string>()->default_value("accumulation.vol"), "output accumulation vol file.")
-  ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
-  ("outputRad,R", po::value<std::string>()->default_value("radius.vol"), "output radius vol file.")  
-  ("radiusEstimator,e", po::value<std::string>()->default_value("min"),  "use: {min (default), max, mean, median} to estimate the radius") 
+    ("help,h", "display this message")
+    ("input,i", po::value<std::string>(), "input sdp points (x y z format).")
+    ("outputAcc,o", po::value<std::string>()->default_value("accumulation.vol"), "output accumulation vol file.")
+    ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
+    ("outputRad,R", po::value<std::string>()->default_value("radius.vol"), "output radius vol file.")  
+    ("outputAccVectors", po::value<std::string>(), "export the accumulation vectors.")
+    ("outputConfVectors", po::value<std::string>(), "export the confidence vectors.")
+    ("outputPointAssociations", "output point associations instead vectors (used with outputAccVectors and outputConfVectors options). Each pair point of the association are exported sequentially.")
+    ("maxThAccVectors", po::value<unsigned int>()->default_value(50), "threshold the value of accumulations to export the accumulations vectors (used with outputAccVectors) .")
+    ("maxThConfVectors", po::value<double>()->default_value(0.75), "threshold the value of confidence to export the accumulations vectors (used with outputConfVectors) .")
+    ("radiusEstimator,e", po::value<std::string>()->default_value("min"),  "use: {min (default), max, mean, median} to estimate the radius") 
       
-  ("neighborhoodDistance,d",po::value<double>(), "use a neighborhood distance to estimate the normals." )
-  ("neighborhoodNum,n",po::value<unsigned int>(), "set a number of neighbors to define the neighborhood to estimate the normals." )
-
-  ("exportNormalSegments", po::value<std::string>()->default_value("normalPCL.sdp"), "export normal segments estimated from PCL (extremity of normals vectors).")
-  ("exportNormals", po::value<std::string>()->default_value("normalSegPCL.normals"), "export normals estimated from PCL (unit vectors).")
-
-    ("exportPointAssociations", po::value<unsigned int>(), "export in sdp (voxelAssos.sdp) the associated points contributing to the accumulation score (for voxels with score < threshold). Each pair point of the association are exported sequentially.")
-  ("radius,r", po::value<double>()->default_value(5), "radius of accumulation analysis.")
-  ("maxValOutConf", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of confidence out image: 0 .. 1 -> 0 ..  MAX.")
-  ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
-  ("autoScaleRad", po::value<std::string>(), "auto scale out radius image values between 0 and 255.")
-  ("autoScaleConf", po::value<std::string>(), "auto scale out confidence image values between 0 and 255.")
-  ("autoScaleAcc", po::value<std::string>(), "auto scale out accumulation image values between 0 and 255.")
-  ("forceNoAutoOrient", "force to not auto orient the normals vector (not recommanded).");
+    ("neighborhoodDistance,d",po::value<double>(), "use a neighborhood distance to estimate the normals." )
+    ("neighborhoodNum,n",po::value<unsigned int>(), "set a number of neighbors to define the neighborhood to estimate the normals." )
+    
+    ("exportNormalSegments", po::value<std::string>()->default_value("normalPCL.sdp"), "export normal segments estimated from PCL (extremity of normals vectors).")
+    ("exportNormals", po::value<std::string>()->default_value("normalSegPCL.normals"), "export normals estimated from PCL (unit vectors).")
+    ("radius,r", po::value<double>()->default_value(5), "radius of accumulation analysis.")
+    ("maxValOutConf", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of confidence out image: 0 .. 1 -> 0 ..  MAX.")
+    ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
+    ("autoScaleRad", po::value<std::string>(), "auto scale out radius image values between 0 and 255.")
+    ("autoScaleConf", po::value<std::string>(), "auto scale out confidence image values between 0 and 255.")
+    ("autoScaleAcc", po::value<std::string>(), "auto scale out accumulation image values between 0 and 255.")
+    ("forceNoAutoOrient", "force to not auto orient the normals vector (not recommanded).");
   
   bool parseOK = true;
   po::variables_map vm;
@@ -180,8 +183,46 @@ int main(int argc, char *const *argv)
     VolWriter<Image3D,ScaleFct>::exportVol(vm["autoScaleAcc"].as<std::string>(), imageAccumulation, true,  scaleFct);
     trace.info() << "[done]" << std::endl;
   }
-  
-  
+
+   // 3bis) Optionally export the vectors of the accumulation
+ if(vm.count("outputAccVectors"))
+   {
+     std::string outName = vm["outputAccVectors"].as<std::string>();
+     ofstream fout; fout.open(outName.c_str(), ofstream::binary|ofstream::out);
+     unsigned int thAcc = vm["maxThAccVectors"].as<unsigned int>();
+     for(const auto &p: imageAccumulation.domain())
+       {
+         if(imageAccumulation(p)>thAcc)
+           {
+             NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
+             if(setPt.size()!=0){
+               if(vm.count("outputPointAssociations"))
+                 {
+                   fout  << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
+                   NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
+                   for(const auto & pa: neighbors)
+                     {
+                       fout << p[0] << " " << p[1] << " " << p[2] << std::endl;
+                       fout << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
+                     }
+                 }
+               else
+                 {
+                 
+                   fout << p[0] << " " << p[1] << " " << p[2] << " " ;
+                   for(const auto &n: setPt)
+                     {
+                       Z3i::RealPoint v = p-n;
+                       fout << v[0] << " " << v[1] << " " << v[2] << " "; 
+                     }
+                   fout << std::endl;
+                 }
+             }
+           }
+       }
+     fout.close();
+   }
+
   // 4) Compute confidence image 
   normAcc.computeConfidence();
   ImageDouble imageConfidance = normAcc.getConfidenceImage();
@@ -220,24 +261,45 @@ int main(int argc, char *const *argv)
       trace.info() << "[done]" << std::endl;    
     }      
 
- if(vm.count("exportPointAssociations"))
+
+ // 5 bis) Optionally export the vectors of the confidence
+ if(vm.count("outputConfVectors"))
    {
-     std::ofstream outAssociations;
-     outAssociations.open("voxelAssos.sdp");     
-     unsigned int th = vm["exportPointAssociations"].as<unsigned int>();
-     for( const auto &p: imageAccumulation.domain())
+     std::string outName = vm["outputConfVectors"].as<std::string>();
+     ofstream fout; fout.open(outName.c_str(), ofstream::binary|ofstream::out);
+     double thConf = vm["maxThConfVectors"].as<double>();
+     for(const auto &p: imageAccumulation.domain())
        {
-         if (imageAccumulation(p)>th)
+         if(imageConfidance(p)>thConf)
            {
-             outAssociations << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
-             NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
-             for(const auto & pa: neighbors)
-               {
-                 outAssociations << p[0] << " " << p[1] << " " << p[2] << std::endl;
-                 outAssociations << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
-               }
-           }         
+             NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
+             if(setPt.size()!=0){
+               if(vm.count("outputPointAssociations"))
+                 {
+                   fout << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
+                   NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
+                   for(const auto & pa: neighbors)
+                     {
+                       fout << p[0] << " " << p[1] << " " << p[2] << std::endl;
+                       fout << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
+                     }
+                   
+                 }
+               else
+                 {
+                   fout << p[0] << " " << p[1] << " " << p[2] << " " ;
+                   for(const auto &n: setPt)
+                     {
+                       Z3i::RealPoint v = p-n;
+                       fout << v[0] << " " << v[1] << " " << v[2] << " "; 
+                     }
+                   fout << std::endl;
+                 }
+             }
+
+           }
        }
+     fout.close();
    }
  return 0;
 }
