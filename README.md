@@ -8,6 +8,7 @@ Presented at ICPR 2016.
 
 
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a4e66031f4e4058bad43e440c464e11)](https://www.codacy.com/app/kerautret/CDCVAM?utm_source=github.com&utm_medium=referral&utm_content=kerautret/CDCVAM&utm_campaign=badger)
 Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
 
 Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
