@@ -105,7 +105,7 @@ int main(int argc, char *const *argv)
   // 3) Generate accumulation image
   normAcc.computeAccumulation();
   NormalAccumulator::Image3D &imageAccumulation = normAcc.getAccumulationImage();
-
+  
   trace.info() << "Saving accumulation image in " << outputFileAcc;
   LongvolWriter<Image3D>::exportLongvol(outputFileAcc, imageAccumulation);
   trace.info() << "[done]" << std::endl;
