@@ -4,6 +4,7 @@ SET(CDCVAM_TOOLS
  statisticsRadiusErrDistr 
  statisticsRadiusErrEvol 
  statisticsRadiusEstim
+ compMainDirs
 )
 
 
