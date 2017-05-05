@@ -285,8 +285,11 @@ NormalAccumulator::computeAccumulation(bool retainVertexAsso, bool verbose)
     }
   }
   if(verbose)
-    DGtal::trace.progressBar(myNormalField.size(), myNormalField.size());
-  
+    {
+      DGtal::trace.progressBar(myNormalField.size(), myNormalField.size());
+      DGtal::trace.info() << std::endl << "Max accumulation  value: "<< myMaxAccumulation << std::endl;
+      DGtal::trace.info()  << "Max accumulation Point: "<< myMaxAccumulationPoint << std::endl;
+    }
   myIsAccumulationComputed = true;
 }
 
