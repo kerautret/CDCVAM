@@ -229,7 +229,7 @@ int main(int argc, char *const *argv)
   LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileConf, imageConfidance, true, scaleFct);
   trace.info() << "[done]" << std::endl;
   
-  if(vm.count("autoScaleConfidence"))
+  if(vm.count("autoScaleConf"))
     {
       std::string outNameAutoConf = vm["autoScaleConf"].as<std::string>();
       trace.info() << "Saving confidence (auto scale 0 1 -> [0, 255]) image in " << outNameAutoConf << " ... ";
