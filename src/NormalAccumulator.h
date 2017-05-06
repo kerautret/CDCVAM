@@ -157,7 +157,7 @@ public:
    * @param updateVertexAsso if true update the image association with only the confident vertex. 
    * 
    **/
-  void computeConfidence(bool updateVertexAsso = true);
+  void computeConfidence(bool updateVertexAsso = true, unsigned int minAcc=1);
   
   
   /**

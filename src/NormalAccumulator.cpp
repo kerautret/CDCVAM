@@ -373,7 +373,7 @@ NormalAccumulator::getAssociatedPoints(const DGtal::Z3i::Point &aVoxel)
 
 
 void
-NormalAccumulator::computeConfidence(bool updateVertexAsso)
+NormalAccumulator::computeConfidence(bool updateVertexAsso, unsigned int minAcc )
 {
   // Step 1: ensure that accumulation is computed and clean association image if needed.
   assert(myIsAccumulationComputed);
@@ -419,7 +419,7 @@ NormalAccumulator::computeConfidence(bool updateVertexAsso)
   
   // Step 3: Compute confidance image indicating the rate between accIsMax/acc
   for(auto &v: myDomain){
-    if ( myAccumulationImage(v) > 1 )
+    if ( myAccumulationImage(v) > minAcc )
       myConfidenceImage.setValue(v, scoreConfidance(v)/(double)myAccumulationImage(v));
   }
   myIsAssociationCompFromConfidence = updateVertexAsso;

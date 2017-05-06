@@ -27,10 +27,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include <pcl/features/integral_image_normal.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/point_types.h>
-
 
 
 #include "AccumulatorHelper.h"
@@ -67,6 +63,7 @@ int main(int argc, char *const *argv)
     ("outputAccVectors", po::value<std::string>(), "export the accumulation vectors.")
     ("outputConfVectors", po::value<std::string>(), "export the confidence vectors.")
     ("outputPointAssociations", "output point associations instead vectors (used with outputAccVectors and outputConfVectors options). Each pair point of the association are exported sequentially.")
+    ("minAccumulation", po::value<DGtal::uint64_t>()->default_value(255), "min value of the accumumation to consider the computation of the confidence.")
     ("maxThAccVectors", po::value<unsigned int>()->default_value(50), "threshold the value of accumulations to export the accumulations vectors (used with outputAccVectors) .")
     ("maxThConfVectors", po::value<double>()->default_value(0.75), "threshold the value of confidence to export the accumulations vectors (used with outputConfVectors) .")
     ("radiusEstimator,e", po::value<std::string>()->default_value("min"),  "use: {min (default), max, mean, median} to estimate the radius") 
@@ -107,7 +104,7 @@ int main(int argc, char *const *argv)
   
   DGtal::uint64_t outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
   DGtal::uint64_t outRadiusMax = vm["maxValOutRad"].as<DGtal::uint64_t>();
-  
+  DGtal::uint64_t minAccumulation = vm["minAccumulation"].as<DGtal::uint64_t>();
 
   // 1) Reading input point and normals
 
@@ -221,7 +218,7 @@ int main(int argc, char *const *argv)
    }
 
   // 4) Compute confidence image 
-  normAcc.computeConfidence();
+ normAcc.computeConfidence(false, minAccumulation);
   ImageDouble imageConfidance = normAcc.getConfidenceImage();
   trace.info() << "Saving confidence image in " << outputFileConf << " ... ";
   typedef functors::Rescaling<double, DGtal::uint64_t> ScaleFctD;
