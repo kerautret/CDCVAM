@@ -65,6 +65,7 @@ int main(int argc, char *const *argv)
     ("invertNormal,n", "invert normal to apply accumulation.")
     ("exportGeodesic,e",po::value<std::string>(), "to export the geodesic as a sequence of points")
     ("exportConfident,c",po::value<std::string>(), "to export the confident voxel as a sequence of points")
+    ("importPointsNormals", po::value<std::string>(), "import normals and source points.")
     ("importNormals", po::value<std::string>(), "Use imported normals instead the one computed from the mesh faces.")
     
     ("deltaG,g",  po::value<double>()->default_value(3.0), "the param to consider interval of distances "
@@ -92,7 +93,7 @@ int main(int argc, char *const *argv)
     parseOK = false;
   }
   po::notify(vm);
-  if ( !parseOK || vm.count("help") || argc <= 1 || !vm.count("input") )
+  if ( !parseOK || vm.count("help") || argc <= 1 || (!vm.count("input")&&!vm.count("importPointsNormals") ))
   {
     trace.info() << "Center line extraction from accumulation  and geodesic graph" << std::endl
                  << "Options: " << std::endl
@@ -102,7 +103,7 @@ int main(int argc, char *const *argv)
 
 
   // Reading parameters:
-  std::string inputMeshName = vm["input"].as<std::string>();
+  
   std::string outputName = vm["output"].as<std::string>();
   double dilateDist = vm["dilateDist"].as<double>();
   double th = vm["th"].as<double>();
@@ -115,28 +116,45 @@ int main(int argc, char *const *argv)
   unsigned int minSizeCC = vm["minSizeCC"].as<unsigned int>();
   bool importNormals = vm.count("importNormals");
   
-  
+  NormalAccumulator acc(radius, estimRadiusType);
   DGtal::trace.info() << "------------------------------------ "<< std::endl;
   DGtal::trace.info() << "Step 1: Reading input mesh ... ";
-
-  // 1) Reading input mesh:
-  DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
-  aMesh << inputMeshName;
-  DGtal::trace.info() << " [done] " << std::endl;  
-  DGtal::trace.info() << "------------------------------------ "<< std::endl;  
-
-  // 2) Init accumulator:
-  DGtal::trace.info() << "Step 2: Init accumulator ... ";
-  NormalAccumulator acc(radius, estimRadiusType);
- if(importNormals){
-    std::vector<DGtal::Z3i::RealPoint> vectorNorm =
-      PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["importNormals"].as<std::string>());
-    acc.initFromMeshAndNormals(aMesh, vectorNorm, invertNormal);
+  
+  if(vm.count("importPointsNormals"))
+    {
+      // 1) Reading input mesh:
+      // format point A and B from normals
+      std::vector<Z3i::RealPoint> vPtA, vPtB;
+      std::string namePt = vm["importPointsNormals"].as<std::string>();
+      vPtA = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(namePt);
+      std::vector<unsigned int> index= {3,4,5};
+      vPtB = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(namePt, index);
+      std::vector<Z3i::RealPoint> vectNormals;
+      for(unsigned int i=0; i<vPtB.size(); i++)
+        {
+          vectNormals.push_back((vPtB[i]-vPtA[i]).getNormalized());
+        }
+      // 2) Init accumulator:
+      DGtal::trace.info() << "Step 2: Init accumulator ... ";
+      acc.initFromNormals(vPtA, vectNormals);
+    }
+  else
+    {
+      // 1) Reading input mesh:
+      std::string inputMeshName = vm["input"].as<std::string>();
+      DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
+      aMesh << inputMeshName;
+      DGtal::trace.info() << " [done] " << std::endl;  
+      DGtal::trace.info() << "------------------------------------ "<< std::endl;  
+      if(importNormals){
+        std::vector<DGtal::Z3i::RealPoint> vectorNorm =
+          PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["importNormals"].as<std::string>());
+        acc.initFromMeshAndNormals(aMesh, vectorNorm, invertNormal);
     
-  }else{
-    acc.initFromMesh(aMesh, invertNormal);
-  }
-
+      }else{
+        acc.initFromMesh(aMesh, invertNormal);
+      }
+    }
   DGtal::trace.info() << " [done] " << std::endl;  
   DGtal::trace.info() << "------------------------------------ "<< std::endl;  
 
@@ -144,7 +162,7 @@ int main(int argc, char *const *argv)
   // 3) Compute accumulation and confidence
   DGtal::trace.info() << "Step 3: Compute accumulation/confidence ... ";
   acc.computeAccumulation();
-  acc.computeConfidence();
+  acc.computeConfidence(false, 30);
   acc.computeRadiusFromConfidence();
   Image3DDouble imageConfidence = acc.getConfidenceImage();
   Image3D imageAccumulation = acc.getAccumulationImage();
