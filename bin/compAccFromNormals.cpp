@@ -20,7 +20,7 @@
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
 #include <DGtal/images/ImageContainerBySTLVector.h>
 #include <DGtal/images/ImageContainerBySTLMap.h>
-#include <DGtal/kernel/sets/DigitalSetFromMap.h>
+
 
 
 #include <boost/program_options/options_description.hpp>
