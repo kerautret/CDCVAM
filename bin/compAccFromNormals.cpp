@@ -111,8 +111,6 @@ int main(int argc, char *const *argv)
   DGtal::trace.info() << "Reading imput points and normals ... " << std::endl;
   std::vector<unsigned int> vectIndPoint1 = {0, 1, 2};
   std::vector<Z3i::RealPoint> setOfPt1 = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFile, vectIndPoint1);
-  std::vector<unsigned int> vectIndPoint2 = {3, 4, 5};
-  std::vector<Z3i::RealPoint> setOfPt2 = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFile, vectIndPoint2);
   std::vector<unsigned int> vectIndNorm = {6, 7, 8};
   std::vector<Z3i::RealPoint> setOfNormals = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFile, vectIndNorm);
 
