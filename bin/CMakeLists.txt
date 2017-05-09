@@ -2,7 +2,7 @@ SET(CDCVAM_BIN
  centerLineGeodesicGraph
  compAccFromMesh
  displayAccuMesh
-)
+ compAccFromNormals)
 
 if (  WITH_VISU3D_QGLVIEWER )
    SET(CDCVAM_BIN ${CDCVAM_BIN} illustrationGraphAllSteps)
