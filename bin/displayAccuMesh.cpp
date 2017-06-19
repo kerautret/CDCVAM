@@ -182,7 +182,7 @@ int main(int argc, char *const *argv)
   // Get the max value:
   
   double maxVal = 0;
-  HueShadeColorMap<double > map(0.0, radius);
+  HueShadeColorMap<double > map(0.0, std::min(cutoff, radius));
   std::vector<unsigned int> faceToBeRemoved;
   if (useConfident){
       DGtal::trace.info() << "compute face accumulation from Confident image...";
