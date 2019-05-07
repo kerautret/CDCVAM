@@ -393,9 +393,8 @@ NormalAccumulator::computeConfidence(bool updateVertexAsso, unsigned int minAcc 
     DGtal::Z3i::RealPoint centerPoint = myNormalOrigins[numNorm];
     DGtal::Z3i::RealPoint currentPoint = centerPoint;
     DGtal::Z3i::RealPoint previousPoint;
-    DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
-
-    DGtal::Z3i::Point aPtMaxAcc = currentPointI;
+    
+    DGtal::Z3i::Point aPtMaxAcc = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
     unsigned int aMaxAcc = 0;
     
     while((currentPoint - centerPoint).norm()<myRadius){
