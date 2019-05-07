@@ -348,7 +348,7 @@ GeodesicGraphComputer::computeVertex3DRepresentant()
   for(unsigned int i=0; i<nbVertex; i++)
     {
       if(vertexNb[i]!=0){
-        vertexRepresentant[i] = vertexRepresentant[i]/vertexNb[i];
+        vertexRepresentant[i] = vertexRepresentant[i]/(int)vertexNb[i];
       }
     }
   // Special case to handle (first vertex is 0 labeled as background voxel, but is a single point)
