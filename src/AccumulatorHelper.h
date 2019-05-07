@@ -62,12 +62,16 @@ public:
         DGtal::Z3i::RealPoint currentPointN = centerPoint;
         DGtal::Z3i::RealPoint previousPointN;       
         while((currentPoint - centerPoint).norm()<maxRadius){
-          if(imgAcc.domain().isInside(currentPoint) && previousPoint != currentPoint){
-            imgAcc.setValue(currentPoint, imgAcc(currentPoint)+1);
+          DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
+          if(imgAcc.domain().isInside(currentPointI)
+             && previousPoint != currentPoint){
+            imgAcc.setValue(currentPointI, imgAcc(currentPointI)+1);
             previousPoint = currentPoint;
           }
-          if(imgAcc.domain().isInside(currentPointN) && previousPointN != currentPointN){
-            imgAcc.setValue(currentPointN, imgAcc(currentPointN)+1);
+          DGtal::Z3i::Point c = DGtal::Z3i::Point(currentPointN,DGtal::functors::Round<>());
+          if(imgAcc.domain().isInside(c) &&
+             previousPointN != currentPointN){
+            imgAcc.setValue(c, imgAcc(c)+1);
             previousPointN = currentPointN;
           }
           previousPoint = currentPoint;
@@ -89,12 +93,14 @@ public:
         DGtal::Z3i::RealPoint currentPointN = centerPoint;
         DGtal::Z3i::RealPoint previousPointN;       
         while((currentPoint - centerPoint).norm()<maxRadius){
-          if(imgAcc.domain().isInside(currentPoint) && previousPoint != currentPoint){
-            somme+=imgAcc(currentPoint);
+          DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
+          if(imgAcc.domain().isInside(currentPointI) && previousPoint != currentPoint){
+            somme+=imgAcc(currentPointI);
             previousPoint = currentPoint;
           }
-          if(imgAcc.domain().isInside(currentPointN) && previousPointN != currentPointN){
-            sommeN+=imgAcc(currentPointN);
+          DGtal::Z3i::Point c = DGtal::Z3i::Point(currentPointN,DGtal::functors::Round<>());
+          if(imgAcc.domain().isInside(c) && previousPointN != currentPointN){
+            sommeN+=imgAcc(c);
             previousPointN = currentPointN;
           }
           previousPoint = currentPoint;
@@ -156,8 +162,10 @@ public:
     DGtal::Z3i::RealPoint currentPoint = centerPoint;
     typename TImageAcc::Value maxVal = 0;
     while((currentPoint - centerPoint).norm()<maxRadius){
-      if(imageAcc.domain().isInside(currentPoint)){
-        typename TImageAcc::Value v = imageAcc(currentPoint);
+      DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
+              
+      if(imageAcc.domain().isInside(currentPointI)){
+        typename TImageAcc::Value v = imageAcc(currentPointI);
         if(v>maxVal && v> thresholdAcc){
           maxVal = v;
           resValue = (currentPoint-centerPoint).norm();
