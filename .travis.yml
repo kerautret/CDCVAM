@@ -27,7 +27,7 @@ addons:
     - libgdcm2-dev 
     - g++-4.8
     - gcc-4.8
-    - libqglviewer-qt4-dev 
+    - libqglviewer-dev
 
 before_install:
   - env
