@@ -57,7 +57,7 @@ int main(int argc, char *const *argv)
   general_opt.add_options()
     ("help,h", "display this message")
     ("input,i", po::value<std::string>(), "input sdp points (x y z format).")
-    ("outputAcc,o", po::value<std::string>()->default_value("accumulation.vol"), "output accumulation vol file.")
+    ("outputAcc,o", po::value<std::string>()->default_value("accumulation.longvol"), "output accumulation longvol file (to export in vol you can use the option --autoScaleAcc to autoscale).")
     ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
     ("outputRad,R", po::value<std::string>()->default_value("radius.vol"), "output radius vol file.")  
     ("outputAccVectors", po::value<std::string>(), "export the accumulation vectors.")
@@ -163,10 +163,16 @@ int main(int argc, char *const *argv)
   normAcc.computeAccumulation();
   NormalAccumulator::Image3D &imageAccumulation = normAcc.getAccumulationImage();
 
+
+  std::string extension = filename.substr( outputFileAcc.find_last_of(".") + 1 );
+  if (extension == "longvol")
+  {
+    trace.warning() << "You are specifying a wrong vol extension, please change it to longvol to avoid any problem (or use the option --autoScaleAcc to autoscale and to save in vol format)." << std::endl;  
+  }
   trace.info() << "Saving accumulation image in " << outputFileAcc;
   LongvolWriter<Image3D>::exportLongvol(outputFileAcc, imageAccumulation);
   trace.info() << "[done]" << std::endl;
-
+  
   if (vm.count("autoScaleAcc")){
     trace.info() << "Saving accumulation (auto scale 0 " << normAcc.getMaxAccumulation() 
                  <<"  -> [0, 255]) image in " << vm["autoScaleAcc"].as<std::string>() << " ... ";
@@ -216,8 +222,15 @@ int main(int argc, char *const *argv)
    }
 
   // 4) Compute confidence image 
- normAcc.computeConfidence(false, minAccumulation);
+  normAcc.computeConfidence(false, minAccumulation);
   ImageDouble imageConfidance = normAcc.getConfidenceImage();
+  std::string extension = filename.substr( outputFileConf.find_last_of(".") + 1 );
+  if (extension == "longvol")
+  {
+    trace.warning() << "You are specifying a wrong vol extension, please change it to longvol to avoid any problem (or use the option --autoScaleConf to autoscale and to save in vol format)." << std::endl;  
+  }
+
+
   trace.info() << "Saving confidence image in " << outputFileConf << " ... ";
   typedef functors::Rescaling<double, DGtal::uint64_t> ScaleFctD;
   ScaleFctD scaleFct(0.0, 1.0, 0, outConfidenceMax);
