@@ -42,8 +42,16 @@ typedef ImageContainerBySTLVector<Z3i::Domain, DGtal::uint64_t> Image3D;
 typedef ImageContainerBySTLVector<Z3i::Domain,  double> ImageDouble;
 
 
-
-
+void checkFileFormat(const std::string &filename,
+                     const std::string &reqExt,
+                     const std::string &warningInstr)
+{
+   std::string extension = filename.substr( filename.find_last_of(".") + 1 );
+  if (extension != reqExt)
+  {
+    trace.warning() << "You are specifying a wrong extension (" << extension << ") for you custom file name "<< filename << ", " << warningInstr << std::endl;  
+  }
+}
 
 
 
@@ -59,7 +67,7 @@ int main(int argc, char *const *argv)
     ("input,i", po::value<std::string>(), "input sdp points (x y z format).")
     ("outputAcc,o", po::value<std::string>()->default_value("accumulation.longvol"), "output accumulation longvol file (to export in vol you can use the option --autoScaleAcc to autoscale).")
     ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
-    ("outputRad,R", po::value<std::string>()->default_value("radius.vol"), "output radius vol file.")  
+    ("outputRad,R", po::value<std::string>()->default_value("radius.longvol"), "output radius vol file.")  
     ("outputAccVectors", po::value<std::string>(), "export the accumulation vectors.")
     ("outputConfVectors", po::value<std::string>(), "export the confidence vectors.")
     ("outputPointAssociations", "output point associations instead vectors (used with outputAccVectors and outputConfVectors options). Each pair point of the association are exported sequentially.")
@@ -108,16 +116,12 @@ int main(int argc, char *const *argv)
 
   // 1) Reading input point and normals
 
-  DGtal::trace.info() << "Reading imput points and normals ... " << std::endl;
+  DGtal::trace.info() << "Reading imput points and normals ... ";
   std::vector<unsigned int> vectIndPoint1 = {0, 1, 2};
   std::vector<Z3i::RealPoint> setOfPt1 = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFile, vectIndPoint1);
-  std::vector<unsigned int> vectIndNorm = {6, 7, 8};
+  std::vector<unsigned int> vectIndNorm = {3, 4, 5};
   std::vector<Z3i::RealPoint> setOfNormals = PointListReader<Z3i::RealPoint>::getPointsFromFile(inputFile, vectIndNorm);
 
-
-
-  
-  
   DGtal::trace.info() << "[done]" << std::endl;
 
 
@@ -163,22 +167,21 @@ int main(int argc, char *const *argv)
   normAcc.computeAccumulation();
   NormalAccumulator::Image3D &imageAccumulation = normAcc.getAccumulationImage();
 
+  checkFileFormat(outputFileAcc,"longvol", "please change it to .longvol to avoid any problem (or use the option --autoScaleAcc to autoscale and to save in vol format) ");
 
-  std::string extension = filename.substr( outputFileAcc.find_last_of(".") + 1 );
-  if (extension == "longvol")
-  {
-    trace.warning() << "You are specifying a wrong vol extension, please change it to longvol to avoid any problem (or use the option --autoScaleAcc to autoscale and to save in vol format)." << std::endl;  
-  }
   trace.info() << "Saving accumulation image in " << outputFileAcc;
   LongvolWriter<Image3D>::exportLongvol(outputFileAcc, imageAccumulation);
-  trace.info() << "[done]" << std::endl;
+  trace.info() << " [done]" << std::endl;
   
   if (vm.count("autoScaleAcc")){
+    std::string outputFileAcc = vm["autoScaleAcc"].as<std::string>();
+    checkFileFormat(outputFileAcc,"vol", "please change it to .vol to avoid any problem.");
+    
     trace.info() << "Saving accumulation (auto scale 0 " << normAcc.getMaxAccumulation() 
-                 <<"  -> [0, 255]) image in " << vm["autoScaleAcc"].as<std::string>() << " ... ";
+                 <<"  -> [0, 255]) image in " << outputFileAcc << " ... ";
     typedef functors::Rescaling<DGtal::uint64_t, unsigned char> ScaleFct;
     ScaleFct  scaleFct (0.0 ,normAcc.getMaxAccumulation(), 0, 255);
-    VolWriter<Image3D,ScaleFct>::exportVol(vm["autoScaleAcc"].as<std::string>(), imageAccumulation, true,  scaleFct);
+    VolWriter<Image3D,ScaleFct>::exportVol(outputFileAcc, imageAccumulation, true,  scaleFct);
     trace.info() << "[done]" << std::endl;
   }
 
@@ -190,6 +193,7 @@ int main(int argc, char *const *argv)
      unsigned int thAcc = vm["maxThAccVectors"].as<unsigned int>();
      for(const auto &p: imageAccumulation.domain())
        {
+     
          if(imageAccumulation(p)>thAcc)
            {
              NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
@@ -224,11 +228,7 @@ int main(int argc, char *const *argv)
   // 4) Compute confidence image 
   normAcc.computeConfidence(false, minAccumulation);
   ImageDouble imageConfidance = normAcc.getConfidenceImage();
-  std::string extension = filename.substr( outputFileConf.find_last_of(".") + 1 );
-  if (extension == "longvol")
-  {
-    trace.warning() << "You are specifying a wrong vol extension, please change it to longvol to avoid any problem (or use the option --autoScaleConf to autoscale and to save in vol format)." << std::endl;  
-  }
+  checkFileFormat(outputFileConf,"longvol", "please change it to .longvol to avoid any problem (or use the option --autoScaleConf to autoscale and to save in vol format)");
 
 
   trace.info() << "Saving confidence image in " << outputFileConf << " ... ";
@@ -240,6 +240,7 @@ int main(int argc, char *const *argv)
   if(vm.count("autoScaleConf"))
     {
       std::string outNameAutoConf = vm["autoScaleConf"].as<std::string>();
+      checkFileFormat(outNameAutoConf,"vol", "please change it to .vol to avoid any problem.");
       trace.info() << "Saving confidence (auto scale 0 1 -> [0, 255]) image in " << outNameAutoConf << " ... ";
       typedef functors::Rescaling<double, unsigned char> ScaleFctD;
       ScaleFctD  scaleFct (0.0 ,1.0, 0, 255);
@@ -250,14 +251,17 @@ int main(int argc, char *const *argv)
 
   // 5) Compute Radius image
   normAcc.computeRadiusFromConfidence();
-  ImageDouble imageRadius = normAcc.getRadiusImage();  
+  ImageDouble imageRadius = normAcc.getRadiusImage();
+  checkFileFormat(outputFileRad,"longvol", "please change it to .longvol to avoid any problem (or use the option --autoScaleRadius to autoscale and to save in vol format) ");
+
   trace.info() << "Saving radius image in " << outputFileRad << " ... ";
   ScaleFctD scaleFct2(0.0, normAcc.getMaxRadius(), 0, outRadiusMax);
   LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileRad, imageRadius, true, scaleFct2);
   trace.info() << "[done]" << std::endl;
- if(vm.count("autoScaleRadius"))
+  if(vm.count("autoScaleRadius"))
     {
       std::string outNameAutoRad = vm["autoScaleRad"].as<std::string>();
+      checkFileFormat(outNameAutoRad,"vol", "please change it to .vol to avoid any problem.");
       trace.info() << "Saving confidence (auto scale 0 " << normAcc.getMaxRadius()
                    << " -> 0 255) image in " << outNameAutoRad << " ... ";
       typedef functors::Rescaling<double, unsigned char> ScaleFctD;
