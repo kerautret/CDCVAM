@@ -265,19 +265,21 @@ NormalAccumulator::computeAccumulation(bool retainVertexAsso, bool verbose)
     DGtal::Z3i::RealPoint previousPoint;
     
     while((currentPoint - centerPoint).norm()<myRadius){
-      if(myDomain.isInside(currentPoint) && previousPoint != currentPoint){
+      DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
+
+      if(myDomain.isInside(currentPointI) && previousPoint != currentPoint){
         // retain for each voxel its associated faces contributing to the accumulation
         if(retainVertexAsso){
-          std::vector<unsigned int> v = myAssociationImage(currentPoint);
+          std::vector<unsigned int> v = myAssociationImage(currentPointI);
           v.push_back(numNorm);        
-          myAssociationImage.setValue(currentPoint, v);
+          myAssociationImage.setValue(currentPointI, v);
         }
-        myAccumulationImage.setValue(currentPoint, myAccumulationImage(currentPoint)+1);
+        myAccumulationImage.setValue(currentPointI, myAccumulationImage(currentPointI)+1);
         previousPoint = currentPoint;
         // update the max of accumulation
-        if( myAccumulationImage(currentPoint)>myMaxAccumulation ) {
-          myMaxAccumulation = myAccumulationImage(currentPoint);
-          myMaxAccumulationPoint = currentPoint;
+        if( myAccumulationImage(currentPointI)>myMaxAccumulation ) {
+          myMaxAccumulation = myAccumulationImage(currentPointI);
+          myMaxAccumulationPoint = currentPointI;
         }
       }
       previousPoint = currentPoint;
@@ -392,15 +394,17 @@ NormalAccumulator::computeConfidence(bool updateVertexAsso, unsigned int minAcc 
     DGtal::Z3i::RealPoint currentPoint = centerPoint;
     DGtal::Z3i::RealPoint previousPoint;
     
-    DGtal::Z3i::RealPoint aPtMaxAcc = currentPoint;
+    DGtal::Z3i::Point aPtMaxAcc = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
     unsigned int aMaxAcc = 0;
     
     while((currentPoint - centerPoint).norm()<myRadius){
-      if(myDomain.isInside(currentPoint) && previousPoint != currentPoint){        
-        unsigned int valAcc = myAccumulationImage(currentPoint);
+      DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
+      
+      if(myDomain.isInside(currentPointI) && previousPoint != currentPoint){                
+        unsigned int valAcc = myAccumulationImage(currentPointI);
         if( valAcc > aMaxAcc){
           aMaxAcc = valAcc;
-          aPtMaxAcc = currentPoint;
+          aPtMaxAcc = currentPointI;
         }        
         previousPoint = currentPoint;
       }
