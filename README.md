@@ -1,6 +1,6 @@
 # CDCVAM
 
-##Source code of the papers:
+## Source code of the papers:
 
 Centerline Detection on Partial Mesh Scans by Confidence Vote in Accumulation Map
 Bertrand Kerautret, Adrien Krähenbühl, Isabelle Debled-Rennesson and Jacques-Olivier Lachaud
