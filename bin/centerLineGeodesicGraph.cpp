@@ -13,11 +13,7 @@
 #include <DGtal/kernel/sets/DigitalSetBySTLSet.h>
 #include "DGtal/geometry/volumes/distance/FMM.h"
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/helpers/Surfaces.h"
@@ -28,7 +24,6 @@
 
 using namespace std;
 using namespace DGtal;
-namespace po = boost::program_options;
 
 
 typedef ImageContainerBySTLVector<Z3i::Domain, bool> Image3DMaker;
@@ -47,85 +42,69 @@ typedef FMM<DistanceImage, AcceptedPointSet, Z3i::DigitalSet, DistanceMeasure> T
 
 
 
-
-
-
 /**
  * @brief main function call
  *
  */
 int main(int argc, char *const *argv)
 {
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input mesh.")
-    ("output,o", po::value<std::string>()->default_value("result"), "the output base name.")
-    ("dilateDist", po::value<double>()->default_value(2.0), "dilate distance of the confidence voxels.")
-    ("invertNormal,n", "invert normal to apply accumulation.")
-    ("exportGeodesic,e",po::value<std::string>(), "to export the geodesic as a sequence of points")
-    ("exportConfident,c",po::value<std::string>(), "to export the confident voxel as a sequence of points")
-    ("importPointsNormals", po::value<std::string>(), "import normals and source points.")
-    ("importNormals", po::value<std::string>(), "Use imported normals instead the one computed from the mesh faces.")
-    
-    ("deltaG,g",  po::value<double>()->default_value(3.0), "the param to consider interval of distances "
-                                                            "to reconstruct the graph from the geodesic.")
-    ("initFromMaxRadius", "init from max radius instead max confidence.")
-    ("th,t", po::value<double>()->default_value(0.5), "threshold in the confidence estimation (included).")
-    ("thAcc,a", po::value<double>()->default_value(0), "threshold on the accumultion (not resampled).")
-    ("maxComp,m", po::value<unsigned int>()->default_value(100), "the maximal number of cc of the graph.")
-    ("minSizeCC,C", po::value<unsigned int>()->default_value(0), "the min size of the graph Connected Component.")
-    ("estimRadiusType", po::value<std::string>()->default_value("mean"), "set the type of the"
-                                              "radius estimation (mean, min, median or max).")
-    ("radius,R", po::value<double>()->default_value(10.0), "radius used to compute the accumulation.");
-  
+  std::string outputName {"result"};
+  std::string inputMeshName;
+  double dilateDist {2.0};
+  bool invertNormal {false};
+  bool initFromMaxRadius {false};
+  std::string exportConfident {""};
+  std::string importPointsNormals {""};
+  std::string importNormals {""};
 
+  double th {0.5};
+  double thAcc {0.0};
+  double deltaG {3.0};
+  unsigned int maxComp {100};
+  unsigned int minSizeCC {0} ;
+  std::string estimRadiusType {"mean"};
+  double radius {10.0};
   
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch (const std::exception &ex)
-  {
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
-    parseOK = false;
-  }
-  po::notify(vm);
-  if ( !parseOK || vm.count("help") || argc <= 1 || (!vm.count("input")&&!vm.count("importPointsNormals") ))
-  {
-    trace.info() << "Center line extraction from accumulation  and geodesic graph" << std::endl
-                 << "Options: " << std::endl
-                 << general_opt << std::endl;
-    return 0;
-  }
-
-
-  // Reading parameters:
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  app.description("Center line extraction from accumulation  and geodesic graph");
   
-  std::string outputName = vm["output"].as<std::string>();
-  double dilateDist = vm["dilateDist"].as<double>();
-  double th = vm["th"].as<double>();
-  double thAcc = vm["thAcc"].as<double>();
-  double radius = vm["radius"].as<double>();
-  bool invertNormal = vm.count("invertNormal");
-  std::string estimRadiusType = vm["estimRadiusType"].as<std::string>();
-  double deltaG = vm["deltaG"].as<double>();
-  unsigned int maxComp = vm["maxComp"].as<unsigned int>();
-  unsigned int minSizeCC = vm["minSizeCC"].as<unsigned int>();
-  bool importNormals = vm.count("importNormals");
+  app.add_option("-i,--input,1", inputMeshName, "input mesh." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputName, "the output base name.", true);
+  app.add_option("--dilateDist", dilateDist, "dilate distance of the confidence voxels.", true);
+  app.add_flag("--invertNormal", invertNormal, "invert normal to apply accumulation.");
+  app.add_option("--exportConfident", exportConfident, "to export the confident voxel as a sequence of points", true);
+  app.add_option("--th,-t",th, "threshold in the confidence estimation (included).", true);
+  app.add_option("--thAcc,-a",thAcc,  "threshold on the accumultion (not resampled).", true);
+  app.add_option("--importPointsNormals", importPointsNormals, "import normals and source points.", true);
+  app.add_option("--importNormals", importNormals, "Use imported normals instead the one computed from the mesh faces.", true);
+  app.add_option("--deltaG,-g", deltaG, "the param to consider interval of distances"
+                 "to reconstruct the graph from the geodesic.", true);
+  
+  app.add_flag("--initFromMaxRadius", initFromMaxRadius, "init from max radius instead max confidence.");
+  app.add_option("--maxComp,-m", maxComp, "the maximal number of cc of the graph.", true );
+  app.add_option("--minSizeCC,-C", minSizeCC, "the min size of the graph Connected Component.", true );
+  app.add_option("--radiusEstimator,-e", estimRadiusType,  "set the type of the radius estimation (mean (default), min, median or max).", true)
+  -> check(CLI::IsMember({"max", "min", "mean", "median"}));
+  app.add_option("--radius,-R", radius, "radius used to compute the accumulation.", true );
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   NormalAccumulator acc(radius, estimRadiusType);
   DGtal::trace.info() << "------------------------------------ "<< std::endl;
   DGtal::trace.info() << "Step 1: Reading input mesh ... ";
   
-  if(vm.count("importPointsNormals"))
+  if(importPointsNormals != "")
     {
       // 1) Reading input mesh:
       // format point A and B from normals
       std::vector<Z3i::RealPoint> vPtA, vPtB;
-      std::string namePt = vm["importPointsNormals"].as<std::string>();
+      std::string namePt = importPointsNormals;
       vPtA = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(namePt);
       std::vector<unsigned int> index= {3,4,5};
       vPtB = PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(namePt, index);
@@ -141,14 +120,13 @@ int main(int argc, char *const *argv)
   else
     {
       // 1) Reading input mesh:
-      std::string inputMeshName = vm["input"].as<std::string>();
       DGtal::Mesh<DGtal::Z3i::RealPoint> aMesh;
       aMesh << inputMeshName;
       DGtal::trace.info() << " [done] " << std::endl;  
       DGtal::trace.info() << "------------------------------------ "<< std::endl;  
-      if(importNormals){
+      if(importNormals != ""){
         std::vector<DGtal::Z3i::RealPoint> vectorNorm =
-          PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(vm["importNormals"].as<std::string>());
+          PointListReader<DGtal::Z3i::RealPoint>::getPointsFromFile(importNormals);
         acc.initFromMeshAndNormals(aMesh, vectorNorm, invertNormal);
     
       }else{
@@ -175,9 +153,8 @@ int main(int argc, char *const *argv)
   DGtal::VolWriter<NormalAccumulator::Image3DDouble,ScaleFctD>::exportVol("confidence.vol",
                                                                           imageConfidence,
                                                                           true, confidencescale);
-  if(vm.count("exportConfident")){
-  
-    std::string confExportName = vm["exportConfident"].as<std::string>();
+  if(exportConfident != ""){
+    std::string confExportName = exportConfident;
     ofstream exstream;
     exstream.open(confExportName.c_str());
     for (auto &p: imageConfidence.domain()){
@@ -191,7 +168,6 @@ int main(int argc, char *const *argv)
   DGtal::trace.info() << "------------------------------------ "<< std::endl;  
   
 
-  
   // 4) Apply graph reconstruction from confidence image.
   // 4a) get initial sef of points:
   GeodesicGraphComputer::TSet aConfidenceSet(imageConfidence.domain());
@@ -204,7 +180,7 @@ int main(int argc, char *const *argv)
     }
   // 4b) set initial point: 
   DGtal::Z3i::Point startPoint; 
-  if(vm.count("initFromMaxRadius")){
+  if(initFromMaxRadius){
     startPoint = acc.getMaxRadiusPoint(); 
   }else {
     startPoint = acc.getMaxAccumulationPoint();   
@@ -213,10 +189,8 @@ int main(int argc, char *const *argv)
   GeodesicGraphComputer gg(deltaG, aConfidenceSet, dilateDist,  acc.getDomain(), startPoint);
   gg.computeGraphFromGeodesic(maxComp, minSizeCC);
   
-
   
   // 4c) graph export:
-
   // export vertex
   stringstream ss;
   ss<<outputName << "Vertex.sdp";
@@ -258,8 +232,5 @@ int main(int argc, char *const *argv)
    }
   outRadius.close();
   
-  
-  
-
   return 0;
 }

@@ -120,7 +120,8 @@ int main(int argc, char *const *argv)
   app.add_option("--radius,-r", radius, "maximal radius of accumulation analysis.", true);
   app.add_option("--cutoff", radius, "max cut off display.", true);
 
-  app.add_option("--radiusEstimator,-e", estimRadiusType,  "set the type of the radius estimation (mean (default), min, median or max).", true);
+  app.add_option("--radiusEstimator,-e", estimRadiusType,  "set the type of the radius estimation (mean (default), min, median or max).", true)
+  -> check(CLI::IsMember({"max", "min", "mean", "median"}));
   app.add_option("--importNormals", importNormals,"Use imported normals instead the one computed from the mesh faces." );
   auto maxRadiusFilterOpt = app.add_option("--filterFacesMaxRadius,-R",maxRadiusFilter, "filter faces with radius greater than a threshold.", true);
   auto minRadiusFilterOpt = app.add_option("--filterFacesMinRadius", minRadiusFilter,"filter faces with radius less than a threshold.", true);
