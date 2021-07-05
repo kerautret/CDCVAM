@@ -7,7 +7,6 @@ Bertrand Kerautret, Adrien Krähenbühl, Isabelle Debled-Rennesson and Jacques-O
 Presented at ICPR 2016.
 
 
-
 Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
 
 Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
