@@ -13,11 +13,6 @@
 #include "DGtal/geometry/volumes/distance/FMM.h"
 
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
-
 #include "NormalAccumulator.h"
 #include "CenterLineHelper.h"
 #include "GeodesicGraphComputer.h"
@@ -25,7 +20,6 @@
 
 using namespace std;
 using namespace DGtal;
-namespace po = boost::program_options;
 
 
 typedef ImageContainerBySTLVector<Z3i::Domain, bool> Image3DMaker;
@@ -40,9 +34,6 @@ typedef L2FirstOrderLocalDistance<DistanceImage, AcceptedPointSet> DistanceMeasu
 typedef FMM<DistanceImage, AcceptedPointSet, DomainPredicate, DistanceMeasure> TFMM;
 
 typedef FMM<DistanceImage, AcceptedPointSet, Z3i::DigitalSet, DistanceMeasure> TFMM2;
-
-
-
 
 
 
