@@ -1,6 +1,6 @@
 PROJECT(CDCVAM)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+cmake_minimum_required(VERSION 3.19)
 
 SET(CDCVAM_SRC_COMP
  ${PROJECT_SOURCE_DIR}/src/GeodesicGraphComputer.cpp  
@@ -15,6 +15,14 @@ INCLUDE_DIRECTORIES(${DGTAL_INCLUDE_DIRS})
 LINK_DIRECTORIES(${DGTAL_LIBRARY_DIRS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 message(STATUS "DGtal found.")
+
+
+ # -----------------------------------------------------------------------------
+ # CPP11
+ # -----------------------------------------------------------------------------
+ set (CMAKE_CXX_STANDARD 11)
+ set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
 
 
 
