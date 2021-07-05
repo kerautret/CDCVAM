@@ -7,11 +7,8 @@
 #include "DGtal/io/readers/PointListReader.h"
 #include <DGtal/io/readers/TableReader.h>
 
+#include "CLI11.hpp"
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -21,13 +18,11 @@
 
 using namespace DGtal;
 using namespace std;
-namespace po = boost::program_options;
 
 typedef ImageContainerBySTLVector<Z3i::Domain, unsigned int> Image3D;
 typedef ImageContainerBySTLVector<Z3i::Domain, Z3i::RealPoint> ImageVector;
 typedef PointVector<9, double> Matrix3x3Point;
 typedef SimpleMatrix<double, 3, 3 > CoVarianceMat;
-
 
 
  /**
@@ -72,8 +67,6 @@ DGtal::Z3i::RealPoint getMainDirsCoVar(const std::vector<DGtal::Z3i::RealPoint> 
 }
 
 
-
-
 DGtal::Z3i::RealPoint getMainDirsAlgoLast(const std::vector<DGtal::Z3i::RealPoint> &accVect,
                                           double minSinAngle)
 {
@@ -108,61 +101,40 @@ DGtal::Z3i::RealPoint getMainDirsAlgoLast(const std::vector<DGtal::Z3i::RealPoin
   return mainDir;
 }
 
-  
 
 
 int main(int argc, char **argv)
-
 {
-
   // parse command line -------------------------------------------------------
-  po::options_description general_opt("Allowed options are");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string >(), "an input file representing the accumulating vectors which contribute in a voxel (format X Y Z V0x V0y V0z V1x V1y V1z ... . " )
-    ("scale,s", po::value<double >()->default_value(2.0), "set the scale of the resultng vectors (ie. length of vector). " )
-    ("useCovariance", "use covariance analysis")
-    ("minAngle",po::value<double >()->default_value(0.01),  "minimal angle to consider two directions equals (used when useCovariance is not selected).")
-    ("output,o", po::value<std::string>()->default_value("outMainDir.sdp"), "the resulting main dir vectors " );
+  // parse command line using CLI ----------------------------------------------
+  string inputFileName;
+  double scale {2.0};
+  bool useCovariance {false};
+  double minAngle {0.01};
+  string outputFileName {"outMainDir.sdp"};
   
-  bool parseOK=true;
-  po::variables_map vm;
-  try
-    {
-      po::store(po::parse_command_line(argc, argv, general_opt), vm);
-    }
-  catch(const std::exception& ex)
-    {
-      parseOK=false;
-      trace.info()<< "Error checking program options: "<< ex.what()<< endl;
-    }
+  CLI::App app;
+    app.description("It computes the main tube direction from the vectors contributing in the accumulation/confidence. \n"
+                    "Two methods are proposed from the algorithm of accumulation and from the covariance matrix (with option useCovariance). \n"
+                    "Typical use example:\n \t compMainDirs -i contribVect.sdp    -o vFieldCoVariance.sdp --useCovariance \n");
   
-
-  // check if min arguments are given and tools description ------------------
-  po::notify(vm);
-  if( !parseOK || vm.count("help")||argc<=1)
-    {
-      std::cout << "Usage: " << argv[0] << " [input]\n"
-                << "It computes the main tube direction from the vectors contributing in the accumulation/confidence. \n"
-                << "Two methods are proposed from the algorithm of accumulation and from the covariance matrix (with option useCovariance). \n"
-                << general_opt << "\n"
-                << "Typical use example:\n \t compMainDirs -i contribVect.sdp    -o vFieldCoVariance.sdp --useCovariance \n";
-      return 0;
-    }  
-  if(! vm.count("input"))
-    {
-      trace.error() << " The file name was not defined" << endl;
-      return 1;
-    }
+  app.add_option("-i,--input,1", inputFileName, "an input file representing the accumulating vectors which contribute in a voxel (format X Y Z V0x V0y V0z V1x V1y V1z ... . " )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--scale,-s", scale, "set the scale of the resultng vectors (ie. length of vector).", true);
+  app.add_flag("--useCovariance", useCovariance,"use covariance analysis" );
+  app.add_option("--minAngle", minAngle,"minimal angle to consider two directions equals (used when useCovariance is not selected).", true);
+  app.add_option("--output,-o,2",outputFileName, "the resulting main dir vectors ", true );
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
 
 
-  //  recover the  args ----------------------------------------------------
-  string inputFileName = vm["input"].as<string>();
-  string outputFileName =  vm["output"].as<string>();
-  double minSinAngle = sin(vm["minAngle"].as<double>());
-                           
+  double minSinAngle = sin(minAngle);
+
   // Reading input file
-    trace.info() << "Reading input vectors...";
+  trace.info() << "Reading input vectors...";
   std::vector<std::vector<double > > vectAccDirs =
     TableReader<double>::getLinesElementsFromFile(inputFileName);
   trace.info()<< "[Done]"<<std::endl;
@@ -183,7 +155,7 @@ int main(int argc, char **argv)
               listV.push_back(Z3i::RealPoint(line[i], line[i+1], line[i+2]));
             }
           Z3i::RealPoint md;
-          if(vm.count("useCovariance"))
+          if(useCovariance)
             {
               md = getMainDirsCoVar(listV);
             }
@@ -198,9 +170,7 @@ int main(int argc, char **argv)
         } 
     }
 
-  
   ofstream fout;
-  double scale = vm["scale"].as<double>();
   fout.open(outputFileName.c_str(), ofstream::out|ofstream::binary);
   for(const auto  &vd: result)
     {
@@ -210,6 +180,3 @@ int main(int argc, char **argv)
   fout.close();
   return 0;
 }
-
-
-

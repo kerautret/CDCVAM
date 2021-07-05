@@ -22,11 +22,7 @@
 #include <DGtal/images/ImageContainerBySTLMap.h>
 
 
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
+#include "CLI11.hpp"
 
 
 #include "AccumulatorHelper.h"
@@ -35,7 +31,6 @@
 
 using namespace std;
 using namespace DGtal;
-namespace po = boost::program_options;
 
 
 typedef ImageContainerBySTLVector<Z3i::Domain, DGtal::uint64_t> Image3D;
@@ -61,58 +56,70 @@ void checkFileFormat(const std::string &filename,
  */
 int main(int argc, char *const *argv)
 {
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input sdp points (x y z format).")
-    ("outputAcc,o", po::value<std::string>()->default_value("accumulation.longvol"), "output accumulation longvol file (to export in vol you can use the option --autoScaleAcc to autoscale).")
-    ("outputConf,c", po::value<std::string>()->default_value("confidence.longvol"), "output confidence longvol file.")
-    ("outputRad,R", po::value<std::string>()->default_value("radius.longvol"), "output radius vol file.")  
-    ("outputAccVectors", po::value<std::string>(), "export the accumulation vectors.")
-    ("outputConfVectors", po::value<std::string>(), "export the confidence vectors.")
-    ("outputPointAssociations", "output point associations instead vectors (used with outputAccVectors and outputConfVectors options). Each pair point of the association are exported sequentially.")
-    ("minAccumulation", po::value<DGtal::uint64_t>()->default_value(255), "min value of the accumumation to consider the computation of the confidence.")
-    ("maxThAccVectors", po::value<unsigned int>()->default_value(50), "threshold the value of accumulations to export the accumulations vectors (used with outputAccVectors) .")
-    ("maxThConfVectors", po::value<double>()->default_value(0.75), "threshold the value of confidence to export the accumulations vectors (used with outputConfVectors) .")
-    ("radiusEstimator,e", po::value<std::string>()->default_value("min"),  "use: {min (default), max, mean, median} to estimate the radius") 
-    ("radius,r", po::value<double>()->default_value(5), "radius of accumulation analysis.")
-    ("maxValOutConf", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of confidence out image: 0 .. 1 -> 0 ..  MAX.")
-    ("maxValOutRad", po::value<DGtal::uint64_t>()->default_value(255), "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.")
-    ("autoScaleRad", po::value<std::string>(), "auto scale out radius image values between 0 and 255.")
-    ("autoScaleConf", po::value<std::string>(), "auto scale out confidence image values between 0 and 255.")
-    ("autoScaleAcc", po::value<std::string>(), "auto scale out accumulation image values between 0 and 255.");
   
-  bool parseOK = true;
-  po::variables_map vm;
+  // parse command line using CLI ----------------------------------------------
+     CLI::App app;
+     std::string inputFileName;
+    
+  string inputFile;
+  string outputFileAcc {"accumulation.longvol"} ;
+  string outputFileConf {"confidence.longvol"};
+  string outputFileRad {"radius.longvol"};
+  string outputAccVectors {""};
+  string outputConfVectors {""};
+  string autoScaleRadius {""};
+  string autoScaleConf {""};
+  string autoScaleAcc {""};
+  string exportNormalSegments {""};
+  string exportNormals {""};
+  bool outputPointAssociations {false};
   
-  try {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  } catch (const std::exception &ex) {
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
-    parseOK = false;
-  }
-  
-  po::notify(vm);
-  
-  if (vm.count("help") || argc <= 1 || !parseOK || !vm.count("input")) {
-    trace.info() << "Compute accumulation from point of cloud and compute the radius (median value) "
-    << "of all normal participating to the accumulation" << std::endl
-    << "Options: " << std::endl
-    << general_opt << "\n";
-    return 0;
-  }
-  
-  double radius = vm["radius"].as<double>();
-  string inputFile = vm["input"].as<std::string>();
-  string outputFileAcc = vm["outputAcc"].as<std::string>();
-  string outputFileRad = vm["outputRad"].as<std::string>();
-  string outputFileConf = vm["outputConf"].as<std::string>();
-  string typeStat = vm["radiusEstimator"].as<string>();
+  double radius {5.0};
+  string typeStat {"min"};
+  DGtal::uint64_t outConfidenceMax {255};
+  DGtal::uint64_t outRadiusMax {255};
+  DGtal::uint64_t minAccumulation {255};
+  unsigned int thAcc {50};//= vm["maxThAccVectors"].as<unsigned int>();
+  double thConf {0.75}; //vm["maxThConfVectors"].as<double>();
 
   
-  DGtal::uint64_t outConfidenceMax = vm["maxValOutConf"].as<DGtal::uint64_t>();
-  DGtal::uint64_t outRadiusMax = vm["maxValOutRad"].as<DGtal::uint64_t>();
-  DGtal::uint64_t minAccumulation = vm["minAccumulation"].as<DGtal::uint64_t>();
+  // parse command line using CLI ----------------------------------------------
+  app.description("Compute accumulation from point of cloud and compute the radius (median value) "
+                  "of all normal participating to the accumulation");
+  app.add_option("-i,--input,1", inputFile, "input sdp points (x y z format)." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--outputAcc,-o,2", outputFileAcc, "output accumulation longvol file (to export in vol you can use the option --autoScaleAcc to autoscale).", true);
+  app.add_option("--outputConf,-c", outputFileConf, "output confidence longvol file.", true);
+  app.add_option("--outputRad,-R", outputFileRad, "output radius vol file.", true);
+  app.add_option("--radius,-r", radius, "radius of accumulation analysis.", true);
+  app.add_option("--radiusEstimator,-e",typeStat,  "use: {min (default), max, mean, median} to estimate the radius", true)
+  -> check(CLI::IsMember({"max", "min", "mean", "median"}));
+  app.add_option("--maxValOutConf",outConfidenceMax, "set MAX scale of confidence out image: 0 .. 1 -> 0 ..  MAX.", true);
+  app.add_option("--maxValOutRad",outRadiusMax, "set MAX scale of radius out image: 0 .. 1 -> 0 ..  MAX.", true);
+  
+  app.add_option("--minAccumulation",outRadiusMax, "min value of the accumumation to consider the computation of the confidence.", true);
+  app.add_option("--outputAccVectors",outputAccVectors, "export the accumulation vectors.");
+  app.add_option("--outputConfVectors",outputAccVectors, "export the confidence vectors.");
+  app.add_flag("--outputPointAssociations", outputPointAssociations, "output point associations instead vectors (used with outputAccVectors and outputConfVectors options). Each pair point of the association are exported sequentially.");
+  
+  app.add_option("--maxThAccVectors",thAcc, "threshold the value of accumulations to export the accumulations vectors (used with outputAccVectors).", true);
+  app.add_option("--maxThConfVectors",thConf, "threshold the value of confidence to export the accumulations vectors (used with outputConfVectors) .", true);
+    
+  app.add_option("--autoScaleRadius",autoScaleRadius, "auto scale out radius image values between 0 and 255.");
+  app.add_option("--autoScaleConf",autoScaleConf, "auto scale out confidence image values between 0 and 255.");
+  app.add_option("--autoScaleAcc",autoScaleAcc, "auto scale out accumulation image values between 0 and 255.");
+  app.add_option("--exportNormalSegments", exportNormalSegments, "export normal segments");
+  app.add_option("--exportNormals", exportNormals, "export normals");
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
+
+  
+ 
+  
 
   // 1) Reading input point and normals
 
@@ -133,9 +140,9 @@ int main(int argc, char *const *argv)
   
   
   // 3) check if export
-  if(vm.count("exportNormalSegments")){
+  if(exportNormalSegments != ""){
     std::ofstream outNormals;
-    string normalSegFileName = vm["exportNormalSegments"].as<std::string>();
+    string normalSegFileName = exportNormalSegments;
     outNormals.open(normalSegFileName);
     double scaleV = 2.0;
     std::vector<Z3i::RealPoint> vPts = normAcc.getNormalOrigins();
@@ -148,9 +155,9 @@ int main(int argc, char *const *argv)
     outNormals.close();
   }
 
-  if(vm.count("exportNormals")){
+  if(exportNormals != ""){
     std::ofstream outNormals;
-    string normalSegFileName = vm["exportNormals"].as<std::string>();
+    string normalSegFileName = exportNormals;
     outNormals.open(normalSegFileName);
     std::vector<Z3i::RealPoint> vNormals = normAcc.getNormalField();
     for (unsigned int i = 0; i < vNormals.size() ; i++) {
@@ -173,10 +180,9 @@ int main(int argc, char *const *argv)
   LongvolWriter<Image3D>::exportLongvol(outputFileAcc, imageAccumulation);
   trace.info() << " [done]" << std::endl;
   
-  if (vm.count("autoScaleAcc")){
-    std::string outputFileAcc = vm["autoScaleAcc"].as<std::string>();
+  if (autoScaleAcc != ""){
+    std::string outputFileAcc = autoScaleAcc;
     checkFileFormat(outputFileAcc,"vol", "please change it to .vol to avoid any problem.");
-    
     trace.info() << "Saving accumulation (auto scale 0 " << normAcc.getMaxAccumulation() 
                  <<"  -> [0, 255]) image in " << outputFileAcc << " ... ";
     typedef functors::Rescaling<DGtal::uint64_t, unsigned char> ScaleFct;
@@ -186,11 +192,10 @@ int main(int argc, char *const *argv)
   }
 
    // 3bis) Optionally export the vectors of the accumulation
- if(vm.count("outputAccVectors"))
+ if(outputAccVectors != "")
    {
-     std::string outName = vm["outputAccVectors"].as<std::string>();
+     std::string outName = outputAccVectors;
      ofstream fout; fout.open(outName.c_str(), ofstream::binary|ofstream::out);
-     unsigned int thAcc = vm["maxThAccVectors"].as<unsigned int>();
      for(const auto &p: imageAccumulation.domain())
        {
      
@@ -198,7 +203,7 @@ int main(int argc, char *const *argv)
            {
              NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
              if(setPt.size()!=0){
-               if(vm.count("outputPointAssociations"))
+               if(outputPointAssociations)
                  {
                    fout  << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
                    NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
@@ -237,9 +242,9 @@ int main(int argc, char *const *argv)
   LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileConf, imageConfidance, true, scaleFct);
   trace.info() << "[done]" << std::endl;
   
-  if(vm.count("autoScaleConf"))
+  if(autoScaleConf != "")
     {
-      std::string outNameAutoConf = vm["autoScaleConf"].as<std::string>();
+      std::string outNameAutoConf = autoScaleConf;
       checkFileFormat(outNameAutoConf,"vol", "please change it to .vol to avoid any problem.");
       trace.info() << "Saving confidence (auto scale 0 1 -> [0, 255]) image in " << outNameAutoConf << " ... ";
       typedef functors::Rescaling<double, unsigned char> ScaleFctD;
@@ -253,14 +258,13 @@ int main(int argc, char *const *argv)
   normAcc.computeRadiusFromConfidence();
   ImageDouble imageRadius = normAcc.getRadiusImage();
   checkFileFormat(outputFileRad,"longvol", "please change it to .longvol to avoid any problem (or use the option --autoScaleRadius to autoscale and to save in vol format) ");
-
   trace.info() << "Saving radius image in " << outputFileRad << " ... ";
   ScaleFctD scaleFct2(0.0, normAcc.getMaxRadius(), 0, outRadiusMax);
   LongvolWriter<ImageDouble, ScaleFctD>::exportLongvol(outputFileRad, imageRadius, true, scaleFct2);
   trace.info() << "[done]" << std::endl;
-  if(vm.count("autoScaleRadius"))
+  if(autoScaleRadius != "")
     {
-      std::string outNameAutoRad = vm["autoScaleRad"].as<std::string>();
+      std::string outNameAutoRad = autoScaleRadius;
       checkFileFormat(outNameAutoRad,"vol", "please change it to .vol to avoid any problem.");
       trace.info() << "Saving confidence (auto scale 0 " << normAcc.getMaxRadius()
                    << " -> 0 255) image in " << outNameAutoRad << " ... ";
@@ -272,18 +276,17 @@ int main(int argc, char *const *argv)
 
 
  // 5 bis) Optionally export the vectors of the confidence
- if(vm.count("outputConfVectors"))
+ if(outputConfVectors != "")
    {
-     std::string outName = vm["outputConfVectors"].as<std::string>();
+     std::string outName = outputConfVectors;
      ofstream fout; fout.open(outName.c_str(), ofstream::binary|ofstream::out);
-     double thConf = vm["maxThConfVectors"].as<double>();
      for(const auto &p: imageAccumulation.domain())
        {
          if(imageConfidance(p)>thConf)
            {
              NormalAccumulator::PointContainer setPt = normAcc.getAssociatedPoints(p);
              if(setPt.size()!=0){
-               if(vm.count("outputPointAssociations"))
+               if(outputPointAssociations)
                  {
                    fout << "# associations of point: (" << p[0] << " " << p[1] << " "<< p[2]<< std::endl;
                    NormalAccumulator::PointContainer neighbors = normAcc.getAssociatedPoints(p);
@@ -292,7 +295,6 @@ int main(int argc, char *const *argv)
                        fout << p[0] << " " << p[1] << " " << p[2] << std::endl;
                        fout << pa[0] << " " << pa[1] << " " << pa[2] << std::endl;                 
                      }
-                   
                  }
                else
                  {
@@ -305,7 +307,6 @@ int main(int argc, char *const *argv)
                    fout << std::endl;
                  }
              }
-
            }
        }
      fout.close();

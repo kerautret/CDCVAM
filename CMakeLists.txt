@@ -21,6 +21,9 @@ message(STATUS "DGtal found.")
 
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 
+# CLI11
+include_directories( "${PROJECT_SOURCE_DIR}/ext/" )
+
 SET(Boost_USE_STATIC_LIBS   ON)
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_RUNTIME OFF)

@@ -7,31 +7,25 @@
 #include "DGtal/io/readers/MeshReader.h"
 #include "DGtal/io/writers/VolWriter.h"
 #include "DGtal/io/colormaps/HueShadeColorMap.h"
-#include <DGtal/images/ImageContainerBySTLVector.h>
-#include <DGtal/images/ImageContainerBySTLMap.h>
-#include <DGtal/kernel/sets/DigitalSetFromMap.h>
-#include <DGtal/kernel/sets/DigitalSetBySTLSet.h>
+#include "DGtal/images/ImageContainerBySTLVector.h"
+#include "DGtal/images/ImageContainerBySTLMap.h"
+#include "DGtal/kernel/sets/DigitalSetFromMap.h"
+#include "DGtal/kernel/sets/DigitalSetBySTLSet.h"
 #include "DGtal/geometry/volumes/distance/FMM.h"
-
-
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
 
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/helpers/Surfaces.h"
-
-#include <DGtal/math/Statistic.h>
+#include "DGtal/math/Statistic.h"
 
 #include "NormalAccumulator.h"
+
+#include "CLI11.hpp"
 
 
 typedef DGtal::DigitalSetBySTLSet<DGtal::Z3i::Domain> TSet;
 
 using namespace std;
 using namespace DGtal;
-namespace po = boost::program_options;
 
 
 typedef ImageContainerBySTLVector<Z3i::Domain, bool> Image3DMaker;
@@ -114,46 +108,30 @@ computeCC_UF(const TImage &image, typename TImage::Value th )
  */
 int main(int argc, char *const *argv)
 {
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input mesh.")
-    ("output,o", po::value<std::string>()->default_value("result"), "the output base name.")
-    ("indexExportSDP,e", po::value<int>()->default_value(50), "the threhold to export the sdp file of elements")
-    ("invertNormal,n", "invert normal to apply accumulation.")
-    ("radiusComputeAcc,d", po::value<double>()->default_value(10.0), "distance (d_{acc}) used to compute the accumulation.");
-  
-
-  
-  
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch (const std::exception &ex)
-  {
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
-    parseOK = false;
-  }
-  po::notify(vm);
-  if ( !parseOK || vm.count("help") || argc <= 1 || !vm.count("input") )
-  {
-    trace.info() << "Computes centricity on the nb of CC obtained on confidence and accumulation estimation." << std::endl
-                 << "Options: " << std::endl
-                 << general_opt << std::endl;
-    return 0;
-  }
-
-
   // Reading parameters:
-  std::string inputMeshName = vm["input"].as<std::string>();
-  std::string outputName = vm["output"].as<std::string>();
-  bool invertNormal = vm.count("invertNormal");
-  double radiusComputeAcc = vm["radiusComputeAcc"].as<double>();
-  int indexExportSDP = vm["indexExportSDP"].as<int>();
+  std::string inputMeshName;
+  std::string outputName {"result"};
+  bool invertNormal {false};
+  int indexExportSDP {50};
+  double radiusComputeAcc {10.0};
   
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  app.description("Computes centricity on the nb of CC obtained on confidence and accumulation estimation.");
+  app.add_option("-i,--input,1", inputMeshName, "input mesh." )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputName, "the output base name.", true);
+  app.add_option("--invertNormal,-n", invertNormal, "invert normal to apply accumulation.");
+  app.add_option("--indexExportSDP,-e",indexExportSDP, "the threhold to export the sdp file of elements" );
+  app.add_option("--radiusComputeAcc,-d",radiusComputeAcc, "distance (d_{acc}) used to compute the accumulation.", true );
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+  
+
+ 
   DGtal::trace.info() << "------------------------------------ "<< std::endl;
   DGtal::trace.info() << "Step 1: Reading input mesh ... ";
 
