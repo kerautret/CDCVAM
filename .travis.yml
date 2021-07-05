@@ -33,12 +33,10 @@ before_install:
   - env
   - export SRC_DIR="`pwd`"
   - if [ $CXX == "g++" ]; then export CXX="g++-4.8"  CC="gcc-4.8" CCOMPILER="gcc-4.8" CXXCOMPILER="g++-4.8"; fi
-  - export CMAKE_MODULE_PATH="$BOOST_ROOT"
 
 before_script:
   - 'echo "using gcc : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" > ~/user-config.jam'
   - 'echo "using clang : : ccache $CXX : <cflags>-std=c11 <cxxflags>-std=c++11 ;" >> ~/user-config.jam'
-  - cd "$BOOST_ROOT"; ./b2 toolset="$BOOST_TOOLSET" threading=multi --prefix="$BOOST_ROOT" -d0 install
   - cd $SRC_DIR
   - git clone git://github.com/DGtal-team/DGtal.git
   - cd DGtal
