@@ -27,7 +27,7 @@ int displayVoxelInfos( void* viewer, int name, void* data )
   std::vector<Z3i::Point>* vectVoxels = aData->vectVoxels;
   MyViewer *aViewer = (MyViewer *) viewer;
   GeodesicGraphComputer * gg = aData->geoGraph;
-  stringstream ss ; ss << "Voxel label: " << (int) gg->getLabelImage()((*vectVoxels)[ name ]);
+  std::stringstream ss ; ss << "Voxel label: " << (int) gg->getLabelImage()((*vectVoxels)[ name ]);
   ss << "degree "<< (int) gg->getDegreeImage()((*vectVoxels)[ name ])
      << " representant:" << gg->myGraph.getVertexRepresentant(gg->getLabelImage()((*vectVoxels)[ name ]));
 
@@ -35,7 +35,7 @@ int displayVoxelInfos( void* viewer, int name, void* data )
   aViewer->displayMessage(QString(ss.str().c_str()), 100000);
   aViewer->deleteCubeList(name);
   //(*aViewer).updateList(false);
-  cout << "voxel: " << (*vectVoxels)[ name ] << " selected." << endl;
+  std::cout << "voxel: " << (*vectVoxels)[ name ] << " selected." << std::endl;
   return 0;
 }
 
