@@ -60,7 +60,8 @@ int main(int argc, char *const *argv)
   app.add_option("--output,-o,2",outputName, "the output base name.", true );
   app.add_option("--invertNormal,-n", invertNormal, "invert normal to apply accumulation.");
   app.add_option("--estimRadiusType", estimRadiusType,  "set the type of the"
-                 "radius estimation (mean (default), min, median or max).", true);
+                 "radius estimation (mean (default), min, median or max).", true)
+    -> check(CLI::IsMember({"max", "min", "mean", "median"}));
   app.add_option("--radius,-R",radius, "radius used to compute the accumulation.", true);
   
 

@@ -6,20 +6,13 @@
 #include "DGtal/base/Common.h"
 #include "DGtal/io/readers/MeshReader.h"
 #include <DGtal/io/readers/PointListReader.h>
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
 #include <DGtal/math/Statistic.h>
 
+#include "CLI11.hpp"
 #include "NormalAccumulator.h"
-
-
 
 using namespace std;
 using namespace DGtal;
-namespace po = boost::program_options;
-
 
 typedef ImageContainerBySTLVector<Z3i::Domain, bool> Image3DMaker;
 typedef ImageContainerBySTLVector<Z3i::Domain, DGtal::uint64_t> Image3D;
@@ -28,67 +21,52 @@ typedef ImageContainerBySTLVector<Z3i::Domain, unsigned char> Image3DChar;
 typedef ImageContainerBySTLVector<Z3i::Domain,double> DistanceImage;
 
 
-
-
 /**
  * @brief main function call
  *
  */
 int main(int argc, char *const *argv)
 {
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-  ("help,h", "display this message")
-  ("input,i", po::value<std::string>(), "input mesh.")
-  ("manualFixRef", po::value<std::string>(), "use a manual reference set instead using confidence threshold" )
-  ("output,o", po::value<std::string>()->default_value("result"), "the output base name.")
-  ("outputGlobalStat", po::value<std::string>()->default_value("resultGlobal"), "basename of the global result (mean max, min) (result appened to the end of file.")
-  ("invertNormal,n", "invert normal to apply accumulation.")
-  ("estimRadiusType", po::value<std::string>()->default_value("mean"), "set the type of the"
-   "radius estimation (mean, min, median or max).")
-  ("confidenceTh", po::value<double>()->default_value(0.5), "with this options errors are calculated on a same set defined from confidence threshold")
-  ("commonSet,c", "with this options errors are computed on a same set defined form confidence threshold 0.5")
-  ("radiusCompare,R", po::value<double>()->default_value(10.0), "reference Radius to apply comparisons.")
-  ("radiusComputeAcc,r", po::value<double>()->default_value(10.0), "radius used to compute the accumulation.");
-  
-  
-  
-  
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch (const std::exception &ex)
-  {
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
-    parseOK = false;
-  }
-  po::notify(vm);
-  if ( !parseOK || vm.count("help") || argc <= 1 || !vm.count("input") )
-  {
-    trace.info() << "Compute radius statistics obtained on confidence and accumulation estimation" << std::endl
-    << "Options: " << std::endl
-    << general_opt << std::endl;
-    return 0;
-  }
-  
-  
   // Reading parameters:
-  std::string inputMeshName = vm["input"].as<std::string>();
-  std::string outputName = vm["output"].as<std::string>();
-  std::string outputGlobalStat = vm["outputGlobalStat"].as<std::string>();
+  std::string inputMeshName;
+  std::string outputName {"result"};
+  bool invertNormal {false};
+  std::string estimRadiusType {"mean"};
+  std::string outputGlobalStat {"resultGlobal"};
+  double confidenceTh {0.5};
+
+
+  double radiusCompare {10.0};
+  double radiusComputeAcc {10.0};
+  bool commonSet {false};
+  std::string manualFixRefName {""};
   
-  bool invertNormal = vm.count("invertNormal");
-  std::string estimRadiusType = vm["estimRadiusType"].as<std::string>();
-  double radiusCompare = vm["radiusCompare"].as<double>();
-  double radiusComputeAcc = vm["radiusComputeAcc"].as<double>();
-  bool commonSet = vm.count("commonSet");
-  double confidenceTh = vm["confidenceTh"].as<double>();
-  bool manualFixRef = vm.count("manualFixRef");
-  std::string manualFixRefName = vm["manualFixRef"].as<std::string>();
+
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  app.description("Compute radius statistics obtained on confidence and accumulation estimation");
+  app.add_option("-i,--input,1", inputMeshName, "input mesh" )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputName, "the output base name.", true );
+  app.add_option("--invertNormal,-n", invertNormal, "invert normal to apply accumulation.");
+  app.add_option("--estimRadiusType", estimRadiusType,  "set the type of the"
+                 "radius estimation (mean (default), min, median or max).", true)
+    -> check(CLI::IsMember({"max", "min", "mean", "median"}));
+  app.add_option("--outputGlobalStat", outputGlobalStat, "basename of the global result (mean max, min) (result appened to the end of file.", true);
+ 
+  app.add_option("--manualFixRefName", manualFixRefName,  "use a manual reference set instead using confidence threshold", true);
   
+  app.add_option("--confidenceTh", confidenceTh, "with this options errors are calculated on a same set defined from confidence threshold", true);
+  app.add_option("--radiusCompare,-R", radiusCompare, "reference Radius to apply comparisons.", true);
+  app.add_option("--radiusComputeAcc,-r", radiusComputeAcc, "radius used to compute the accumulation.", true);
+  app.add_flag("--commonSet,-c", commonSet, "with this options errors are computed on a same set defined form confidence threshold 0.5.");
+
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   DGtal::trace.info() << "------------------------------------ "<< std::endl;
   DGtal::trace.info() << "Step 1: Reading input mesh ... ";
@@ -105,7 +83,6 @@ int main(int argc, char *const *argv)
   acc.initFromMesh(aMesh, invertNormal);
   DGtal::trace.info() << " [done] " << std::endl;
   DGtal::trace.info() << "------------------------------------ "<< std::endl;
-  
   
   
   
@@ -135,7 +112,7 @@ int main(int argc, char *const *argv)
   }
   
   // compute stats by thresholding common confidence.
-  if(!manualFixRef){
+  if(manualFixRefName == ""){
     for(auto const &p: imageRadiusAcc.domain())
     {
       double valConf = imageConfidence(p);
@@ -171,19 +148,13 @@ int main(int argc, char *const *argv)
       histoErrorAcc[indexA]++;
       
     }
-      
-      
-    
   }
-  
-  
   
   
   stringstream ssConfResName;
   ssConfResName<< outputName << "Confidence.dat";
   stringstream ssAccResName;
   ssAccResName<< outputName << "Accumulation.dat";
-  
   
   std::ofstream outConf, outAcc;
   outConf.open(ssConfResName.str().c_str());
@@ -231,6 +202,3 @@ int main(int argc, char *const *argv)
   
   return 0;
 }
-
-
-
