@@ -14,11 +14,6 @@
 #include "DGtal/geometry/volumes/distance/FMM.h"
 
 
-#include <boost/program_options/options_description.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <boost/program_options/variables_map.hpp>
-
-
 #include "DGtal/topology/KhalimskySpaceND.h"
 #include "DGtal/topology/helpers/Surfaces.h"
 
@@ -26,11 +21,11 @@
 
 #include "NormalAccumulator.h"
 
+#include "CLI11.hpp"
 
 
 using namespace std;
 using namespace DGtal;
-namespace po = boost::program_options;
 
 
 typedef ImageContainerBySTLVector<Z3i::Domain, bool> Image3DMaker;
@@ -49,58 +44,39 @@ typedef FMM<DistanceImage, AcceptedPointSet, Z3i::DigitalSet, DistanceMeasure> T
 
 
 
-
-
-
 /**
  * @brief main function call
  *
  */
 int main(int argc, char *const *argv)
 {
-  po::options_description general_opt("Allowed options are: ");
-  general_opt.add_options()
-    ("help,h", "display this message")
-    ("input,i", po::value<std::string>(), "input mesh.")
-    ("output,o", po::value<std::string>()->default_value("result"), "the output base name.")
-    ("invertNormal,n", "invert normal to apply accumulation.")
-    ("estimRadiusType", po::value<std::string>()->default_value("mean"), "set the type of the"
-                                               "radius estimation (mean, min, median or max).")
-    ("radiusCompare,R", po::value<double>()->default_value(10.0), "radius used to compute the accumulation.")
-    ("radiusComputeAcc,r", po::value<double>()->default_value(10.0), "radius used to compute the accumulation.")
-    ("maxSampledOutValues,m", po::value<unsigned int>()->default_value(100), "set the maximal out values resulting of the stats.");
-  
-  
-  
-  bool parseOK = true;
-  po::variables_map vm;
-  try
-  {
-    po::store(po::parse_command_line(argc, argv, general_opt), vm);
-  }
-  catch (const std::exception &ex)
-  {
-    trace.info() << "Error checking program options: " << ex.what() << std::endl;
-    parseOK = false;
-  }
-  po::notify(vm);
-  if ( !parseOK || vm.count("help") || argc <= 1 || !vm.count("input") )
-  {
-    trace.info() << "Compute radius statistics obtained on confidence and accumulation estimation" << std::endl
-                 << "Options: " << std::endl
-                 << general_opt << std::endl;
-    return 0;
-  }
-
-
   // Reading parameters:
-  std::string inputMeshName = vm["input"].as<std::string>();
-  std::string outputName = vm["output"].as<std::string>();
-  double radiusCompare = vm["radiusCompare"].as<double>();
-  double radiusComputeAcc = vm["radiusComputeAcc"].as<double>();
-  bool invertNormal = vm.count("invertNormal");
-  std::string estimRadiusType = vm["estimRadiusType"].as<std::string>();
-  unsigned int maxSampledOutValues = vm["maxSampledOutValues"].as<unsigned int>();
+  std::string inputMeshName;
+  std::string outputName {"result"};
+  bool invertNormal {false};
+  std::string estimRadiusType {"mean"};
+
+  double radiusCompare {10.0};
+  double radiusComputeAcc {10.0};
+  unsigned int maxSampledOutValues {100};
+  
+  CLI::App app;
+  app.description("Compute radius statistics obtained on confidence and accumulation estimation");
+  app.add_option("-i,--input,1", inputMeshName, "input mesh" )
+      ->required()
+      ->check(CLI::ExistingFile);
+  app.add_option("--output,-o,2",outputName, "the output base name.", true );
+  app.add_option("--invertNormal,-n", invertNormal, "invert normal to apply accumulation.");
+  app.add_option("--estimRadiusType,-e", estimRadiusType,  "set the type of theradius estimation (mean, min, median or max). ", true)
+  -> check(CLI::IsMember({"max", "min", "mean", "median"}));
+  app.add_option("--radiusCompare,-R", radiusCompare, "radius used to compute the accumulation.", true);
+  app.add_option("--radiusComputeAcc,-r", radiusComputeAcc, "radius used to compute the accumulation.", true);
+  app.add_option("--maxSampledOutValues,-m", radiusComputeAcc, "set the maximal out values resulting of the stats.", true);
+
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+
   
   
   DGtal::trace.info() << "------------------------------------ "<< std::endl;

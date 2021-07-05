@@ -124,7 +124,7 @@ int main(int argc, char **argv)
   app.add_option("--scale,-s", scale, "set the scale of the resultng vectors (ie. length of vector).", true);
   app.add_flag("--useCovariance", useCovariance,"use covariance analysis" );
   app.add_option("--minAngle", minAngle,"minimal angle to consider two directions equals (used when useCovariance is not selected).", true);
-  app.add_option("--output,-o",outputFileName, "the resulting main dir vectors ", true );
+  app.add_option("--output,-o,2",outputFileName, "the resulting main dir vectors ", true );
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
