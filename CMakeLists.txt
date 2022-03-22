@@ -1,7 +1,7 @@
 PROJECT(CDCVAM)
 
 cmake_minimum_required (VERSION 3.1)
-
+cmake_policy(SET CMP0057 NEW) # the new interpretation of IN_LIST is by default not set (at least until  3.21.1).
 
 SET(CDCVAM_SRC_COMP
  ${PROJECT_SOURCE_DIR}/src/GeodesicGraphComputer.cpp  
