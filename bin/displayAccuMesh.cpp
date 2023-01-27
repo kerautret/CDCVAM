@@ -36,7 +36,7 @@ typedef ImageContainerBySTLMap<Z3i::Domain,double> DistanceImage;
 typedef DigitalSetFromMap<DistanceImage> AcceptedPointSet;
 typedef Z3i::Domain::Predicate DomainPredicate;
 
-
+typedef Mesh<Z3i::RealPoint>::FaceStorage FaceStorage;
 
 template<typename TImage>
 TImage
@@ -170,7 +170,7 @@ int main(int argc, char *const *argv)
   
   double maxVal = 0;
   HueShadeColorMap<double > map(0.0, std::min(cutoff, radius));
-  std::vector<unsigned int> faceToBeRemoved;
+  std::vector<Mesh<Z3i::RealPoint>::Index> faceToBeRemoved;
   if (useConfident){
       DGtal::trace.info() << "compute face accumulation from Confident image...";
   }else{

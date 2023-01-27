@@ -1,3 +1,8 @@
+# Version 1.2
+
+  - Fix comilation issue of displayAccuMesh. 
+   (Bertrand Kerautret [#28](Kerautret https://github.com/kerautret/CDCVAM/pull/28))
+
 
 # Version 1.1
 
