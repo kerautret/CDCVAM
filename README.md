@@ -8,11 +8,9 @@ Bertrand Kerautret, Adrien Krähenbühl, Isabelle Debled-Rennesson and Jacques-O
 Presented at ICPR 2016.
 
 
-Linux/MacOs build: [![Build Status](https://travis-ci.com/kerautret/CDCVAM.svg?token=yURwTCTvpqppf6PxJuXv&branch=master)](https://travis-ci.com/kerautret/CDCVAM)
+Linux/MacOs build: [![CI (linux/macOS)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml/badge.svg)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml)
 
 Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
-
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b2d71e450172476d9b86c89b41e6078d)](https://www.codacy.com/gh/kerautret/CDCVAM/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kerautret/CDCVAM&amp;utm_campaign=Badge_Grade)
 
 ## Dependencies
 
