@@ -3,7 +3,9 @@
   - Fix comilation issue of displayAccuMesh. 
    (Bertrand Kerautret [#28](Kerautret https://github.com/kerautret/CDCVAM/pull/28))
 
-
+  - Remove travis and add github actions.
+   (Bertrand Kerautret [#29](Kerautret https://github.com/kerautret/CDCVAM/pull/29))
+   
 # Version 1.1
 
   - Fix cmake issue with boost
