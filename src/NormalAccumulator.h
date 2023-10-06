@@ -41,14 +41,15 @@ public:
   typedef typename DGtal::Z3i::Domain Domain; 
   typedef typename DGtal::Z3i::RealPoint Point; 
   typedef typename DGtal::Z3i::RealPoint Vector; 
+  typedef std::vector<unsigned int> PointIndexContainer;
   typedef std::vector<Point> PointContainer;
-  typedef std::vector<Vector> VectorContainer;  
+  typedef std::vector<Vector> VectorContainer;
   
   // types of image containers:
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain, DGtal::uint64_t> Image3D;
   typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain, double> Image3DDouble;
   // to recover the origin point which has contributed to a particular voxel.
-  typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain,  std::vector<unsigned int> > ImagePointAssociation;
+  typedef DGtal::ImageContainerBySTLVector<DGtal::Z3i::Domain,  PointIndexContainer > ImagePointAssociation;
 
   
 
@@ -189,6 +190,22 @@ public:
 
   PointContainer getAssociatedPoints(const DGtal::Z3i::Point &aVoxel); 
   
+    
+    /**
+     * Get the associated input index points  associated to a voxel. It can be
+     * all the points with normal contributing to the accumulation or
+     * the confidence (if the point association is updated whe when
+     * calling computeConfidence and passing true on argument
+     * updateVertexAsso).
+     * The index can be useful to process mesh by recovering the index of the
+     * face voting for the particular voxel.
+     *
+     *
+     * @param aVoxel the input voxel
+     * @return the container with all point contributing to the condidence.
+     **/
+
+    PointIndexContainer getAssociatedIndexPoints(const DGtal::Z3i::Point &aVoxel);
   
   /**
    * return the maximum accumulation value. 

@@ -371,6 +371,16 @@ NormalAccumulator::getAssociatedPoints(const DGtal::Z3i::Point &aVoxel)
   return result;
 }
 
+NormalAccumulator::PointIndexContainer
+NormalAccumulator::getAssociatedIndexPoints(const DGtal::Z3i::Point &aVoxel)
+{
+  PointIndexContainer result;
+  for(unsigned int ptId :myAssociationImage(aVoxel)){
+    result.push_back(ptId);
+  }
+  return result;
+}
+
 
 
 
