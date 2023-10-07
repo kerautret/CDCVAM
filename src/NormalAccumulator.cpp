@@ -409,8 +409,10 @@ NormalAccumulator::computeConfidence(bool updateVertexAsso, unsigned int minAcc 
     
     while((currentPoint - centerPoint).norm()<myRadius){
       DGtal::Z3i::Point currentPointI = DGtal::Z3i::Point(currentPoint,DGtal::functors::Round<>());
-      
-      if(myDomain.isInside(currentPointI) && previousPoint != currentPoint){                
+        DGtal::Z3i::Point previousPointI = DGtal::Z3i::Point(previousPoint,
+                                                             DGtal::functors::Round<>());
+
+      if(myDomain.isInside(currentPointI) && previousPointI != currentPointI){
         unsigned int valAcc = myAccumulationImage(currentPointI);
         if( valAcc > aMaxAcc){
           aMaxAcc = valAcc;
