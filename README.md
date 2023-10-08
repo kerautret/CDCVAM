@@ -10,7 +10,6 @@ Presented at ICPR 2016.
 
 Linux/MacOs build: [![CI (linux/macOS)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml/badge.svg)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml)
 
-Windows build: [![Build status](https://ci.appveyor.com/api/projects/status/ta5k0fvxmgaj3y4u?svg=true)](https://ci.appveyor.com/project/kerautret/cdcvam)
 
 ## Dependencies
 
