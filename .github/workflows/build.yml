@@ -84,6 +84,19 @@ jobs:
            echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            ninja
+     - name: DGtalBuild (windows)
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       working-directory: ${{runner.workspace}}/build
+       run: |
+           git clone --depth 1 https://github.com/DGtal-team/DGtal.git
+           cd DGtal
+           mkdir buildDGtal
+           cd buildDGtal
+           echo  cmake .. -DCMAKE_BUILD_TYPE=Release $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           cmake .. -DCMAKE_BUILD_TYPE=Release $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+           cmake --build . --config Release --parallel 3
+         
      - name: Configure CMake (windows)
        if: matrix.os == 'windows-latest'
        shell: bash
