@@ -11,6 +11,8 @@ env:
   BUILD_TYPE:   Release
   CONFIG_GLOBAL: 
   CONFIG_LINUX: 
+  CONFIG_WINDOWS: -DWITH_OPENMP=true -DENABLE_CONAN=true #-DWITH_FFTW3=true  #-DWITH_CAIRO=true #-DWITH_ITK=true  -DWITH_GMP=true
+
 
 jobs:
   build:
@@ -18,7 +20,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, macOS-latest,windows-latest]
 
     steps:
 
@@ -36,6 +38,23 @@ jobs:
      - name: Install macOS deps
        if: matrix.os == 'macOS-latest'
        run: brew install boost ninja eigen gmp
+     - name: Install conan
+       if: matrix.os == 'windows-latest'
+       id: conan
+       uses: turtlebrowser/get-conan@main
+       with:
+         version: 1.57.0
+     - name: Create conan default profile
+       if: matrix.os == 'windows-latest'
+       run: conan profile new default --detect
+
+     - uses: actions/cache@v3
+       if: matrix.os == 'windows-latest'
+       with:
+         path: ~/.conan
+         key: ${{ runner.os }}-conan-Release
+
+
 
      - name: Create Build Environment
        run: cmake -E make_directory ${{runner.workspace}}/build
@@ -65,7 +84,11 @@ jobs:
            echo  cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            cmake .. $CONFIG_MAC -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  -G Ninja
            ninja
-
+     - name: Configure CMake (windows)
+       if: matrix.os == 'windows-latest'
+       shell: bash
+       working-directory: "${{runner.workspace}}/build"
+       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=Release -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}" 
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
        shell: bash
@@ -82,6 +105,6 @@ jobs:
        working-directory: ${{runner.workspace}}/build
        shell: bash
        # Execute the build.  You can specify a specific target with "--target <NAME>"
-       run: cmake --build . --config $BUILD_TYPE  
+       run: cmake --build . --config Release
 
 
