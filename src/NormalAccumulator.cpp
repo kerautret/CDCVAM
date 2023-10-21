@@ -55,6 +55,7 @@ NormalAccumulator::initFromMesh(const DGtal::Mesh<Point> &aMesh, bool invertNorm
                                 bb.second + DGtal::Z3i::RealPoint::diagonal(3*myRadius));
   myAccumulationImage = NormalAccumulator::Image3D(myDomain);
   myConfidenceImage = NormalAccumulator::Image3DDouble(myDomain);
+  myConfidentVoteImage = NormalAccumulator::Image3D(myDomain);
   myRadiusImage = NormalAccumulator::Image3DDouble(myDomain);
   myAssociationImage = NormalAccumulator::ImagePointAssociation(myDomain);
   if (myIsVerbose)
@@ -434,10 +435,12 @@ NormalAccumulator::computeConfidence(bool updateVertexAsso, unsigned int minAcc 
   }
   
   // Step 3: Compute confidance image indicating the rate between accIsMax/acc
-  for(auto &v: myDomain){
-    if ( myAccumulationImage(v) > minAcc )
-      myConfidenceImage.setValue(v, scoreConfidance(v)/(double)myAccumulationImage(v));
-  }
+    for(auto &v: myDomain){
+        if ( myAccumulationImage(v) > minAcc )
+            myConfidenceImage.setValue(v, scoreConfidance(v)/(double)myAccumulationImage(v));
+            myConfidentVoteImage.setValue(v, scoreConfidance(v));
+
+    }
   myIsAssociationCompFromConfidence = updateVertexAsso;
   myIsConfidenceComputed = true;
 }
@@ -472,6 +475,11 @@ NormalAccumulator::getAccumulationImage() {
   return myAccumulationImage;
 }
 
+
+NormalAccumulator::Image3D &
+NormalAccumulator::getConfidentVoteImage() {
+  return myConfidentVoteImage;
+}
 
 NormalAccumulator::Image3DDouble & 
 NormalAccumulator::getConfidenceImage(){

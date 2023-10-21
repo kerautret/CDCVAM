@@ -42,7 +42,6 @@ int main(int argc, char *const *argv)
   string inputFile;
   string outputAccOrigins {"exportedAcc.dat"};
   unsigned int thAcc {50};
-  double thConf {0.75};
   double radius {5.0};
   bool invertNormal {false};
   
@@ -59,7 +58,6 @@ int main(int argc, char *const *argv)
   app.add_option("--radius,-r", radius, "radius of accumulation analysis.", true);
   app.add_flag("--invertNormal", invertNormal, "export the accumulation vectors.");
   app.add_option("--maxThAccVectors", thAcc, "threshold the value of accumulations used to decide to export the accumulations vectors (used with outputAccVectors) .", true);
-  app.add_option("--maxThConfVectors",thConf, "threshold the value of confidence to export the accumulations vectors (used with outputConfVectors) .", true);
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -77,17 +75,23 @@ int main(int argc, char *const *argv)
   // 3) Generate accumulation image
   normAcc.computeAccumulation();
   NormalAccumulator::Image3D &imageAccumulation = normAcc.getAccumulationImage();
+  normAcc.computeConfidence(true, thAcc );
+    
+  NormalAccumulator::Image3D &imageConfVote = normAcc.getConfidentVoteImage();
 
  if(outputAccOrigins != "")
    {
      ofstream fout; fout.open(outputAccOrigins.c_str(), ofstream::binary|ofstream::out);
-     for(const auto &p: imageAccumulation.domain())
+     fout << "# Accumulation extracted from the extractAccOrigins tools of CDVAM." << std::endl;
+     fout << "# Format X Y Z AccVal ConfScore FaceId1 FaceId2 ...." << std::endl;
+     
+      for(const auto &p: imageAccumulation.domain())
        {
          if(imageAccumulation(p)>thAcc)
            {
              NormalAccumulator::PointIndexContainer setIndexPt = normAcc.getAssociatedIndexPoints(p);
              if(setIndexPt.size()!=0){
-               fout << p[0] << " " << p[1] << " " << p[2] << " " << imageAccumulation(p) << " "  ;
+               fout << p[0] << " " << p[1] << " " << p[2] << " " << imageAccumulation(p) << " " << imageConfVote(p) << " ";
                for(const auto &i: setIndexPt)
                  {
                    fout << i << " ";

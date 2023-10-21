@@ -66,7 +66,8 @@ public:
                                                           myAccumulationImage(DGtal::Z3i::Domain()),
                                                           myConfidenceImage(DGtal::Z3i::Domain()),
                                                           myRadiusImage(DGtal::Z3i::Domain()),
-                                                          myAssociationImage(DGtal::Z3i::Domain())
+                                                          myAssociationImage(DGtal::Z3i::Domain()),
+                                                          myConfidentVoteImage(DGtal::Z3i::Domain())
                                                                          
 
   {
@@ -241,6 +242,7 @@ public:
   
   Image3D & getAccumulationImage() ;
   
+  Image3D & getConfidentVoteImage() ;
 
   Image3DDouble & getConfidenceImage() ;
 
@@ -269,6 +271,7 @@ protected:
   
 
   Image3D myAccumulationImage;
+  Image3D myConfidentVoteImage; // represent the number of ray for which the voxel is maximal
   Image3DDouble myConfidenceImage;
   Image3DDouble myRadiusImage;    
   ImagePointAssociation myAssociationImage; // to recover all normal origins contributing to an accumulation point.
