@@ -88,7 +88,7 @@ jobs:
        if: matrix.os == 'windows-latest'
        shell: bash
        working-directory: "${{runner.workspace}}/build"
-       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/DGtalTools/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/DGtalTools/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=Release -DDGTAL_RANDOMIZED_TESTING_WHITELIST="${{ steps.whitelist.outputs.WHITELIST }}" 
+       run: cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/CDVAM/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/CDVAM/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=Release 
      - name: Configure CMake (linux)
        if: matrix.os == 'ubuntu-latest'
        shell: bash
