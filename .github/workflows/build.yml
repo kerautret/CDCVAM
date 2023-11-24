@@ -38,12 +38,14 @@ jobs:
      - name: Install macOS deps
        if: matrix.os == 'macOS-latest'
        run: brew install boost ninja eigen gmp
+
      - name: Install conan
        if: matrix.os == 'windows-latest'
        id: conan
        uses: turtlebrowser/get-conan@main
        with:
          version: 1.57.0
+
      - name: Create conan default profile
        if: matrix.os == 'windows-latest'
        run: conan profile new default --detect
