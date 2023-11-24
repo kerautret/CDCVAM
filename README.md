@@ -8,7 +8,7 @@ Bertrand Kerautret, Adrien Krähenbühl, Isabelle Debled-Rennesson and Jacques-O
 Presented at ICPR 2016.
 
 
-Linux/MacOs build: [![CI (linux/macOS)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml/badge.svg)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml)
+Linux/MacOs/Windows build: [![CI (linux/macOS)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml/badge.svg)](https://github.com/kerautret/CDCVAM/actions/workflows/build.yml)
 
 
 ## Dependencies

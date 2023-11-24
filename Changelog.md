@@ -1,5 +1,7 @@
 
 # Version 1.2
+  - Add windows compilation in github action
+   (Bertrand Kerautret [#33](https://github.com/kerautret/CDCVAM/pull/33))
   - Add confidence score extraction from origins.
    (Bertrand Kerautret [#31](https://github.com/kerautret/CDCVAM/pull/31))
   - New tools ExtractAccoOrigins and fix duplicated accumulations values
