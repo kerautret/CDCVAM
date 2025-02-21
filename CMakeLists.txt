@@ -18,11 +18,24 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 message(STATUS "DGtal found.")
 
 
+
  # -----------------------------------------------------------------------------
- # CPP11
+ # CPP17
  # -----------------------------------------------------------------------------
- set (CMAKE_CXX_STANDARD 11)
- set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CDCVAM_MIN_REQUIRED 17)
+ if(NOT CMAKE_CXX_STANDARD)
+   set(CMAKE_CXX_STANDARD ${CDCVAM_MIN_REQUIRED})
+ else()
+  # Throw if CMAKE_CXX_STANDARD is 98
+  if(${CMAKE_CXX_STANDARD} EQUAL 98)
+    message(FATAL_ERROR "CMAKE_CXX_STANDARD is set to ${CMAKE_CXX_STANDARD}, "
+      "but DGtalTools requires at least ${CDCVAM_MIN_REQUIRED}.")
+  endif()
+endif()
+if(NOT CMAKE_CXX_STANDARD_REQUIRED)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
 
 
 

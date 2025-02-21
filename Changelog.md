@@ -1,5 +1,9 @@
 
+
+
 # Version 1.2
+  - Fix comilation issue adding requirement of CPP17. 
+   (Bertrand Kerautret [#28](https://github.com/kerautret/CDCVAM/pull/28))
   - Add windows compilation in github action
    (Bertrand Kerautret [#33](https://github.com/kerautret/CDCVAM/pull/33))
   - Add confidence score extraction from origins.
@@ -8,9 +12,10 @@
    (Bertrand Kerautret [#30](https://github.com/kerautret/CDCVAM/pull/30))
   - Fix comilation issue of displayAccuMesh. 
    (Bertrand Kerautret [#28](https://github.com/kerautret/CDCVAM/pull/28))
-
   - Remove travis and add github actions.
    (Bertrand Kerautret [#29](https://github.com/kerautret/CDCVAM/pull/29))
+   
+   
    
 # Version 1.1
 
