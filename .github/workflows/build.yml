@@ -11,7 +11,7 @@ env:
   BUILD_TYPE:   Release
   CONFIG_GLOBAL: 
   CONFIG_LINUX: 
-  CONFIG_WINDOWS: -DWITH_OPENMP=true -DENABLE_CONAN=true 
+  CONFIG_WINDOWS: -DWITH_OPENMP=true 
 
 
 jobs:
@@ -38,24 +38,22 @@ jobs:
      - name: Install macOS deps
        if: matrix.os == 'macOS-latest'
        run: brew install boost ninja eigen gmp
-
      - name: Install conan
        if: matrix.os == 'windows-latest'
        id: conan
        uses: turtlebrowser/get-conan@main
        with:
-         version: 1.57.0
-
-     - name: Create conan default profile
+         version: 2.4.0
+    - name: Create conan default profile
        if: matrix.os == 'windows-latest'
-       run: conan profile new default --detect
+       run: |
+          conan profile detect --force
 
-     - uses: actions/cache@v3
-       if: matrix.os == 'windows-latest'
-       with:
-         path: ~/.conan
-         key: ${{ runner.os }}-conan-Release
-
+    - uses: actions/cache@v4
+      if: matrix.os == 'windows-latest'
+      with:
+        path: ~/.conan2
+        key: ${{ runner.os }}-conan2-Release
 
 
      - name: Create Build Environment
@@ -95,17 +93,18 @@ jobs:
            cd DGtal
            mkdir buildDGtal
            cd buildDGtal
-           echo  cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false
-           cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
+               echo  cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake"  -DBUILD_EXAMPLES=false -DBUILD_TESTING=false 
+           cmake .. -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=$BUILD_TYPE $CONFIG_WINDOWS -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DBUILD_EXAMPLES=false -DBUILD_TESTING=false  
            cmake --build . --config Release --parallel 3
-         
+           
      - name: Configure CMake (windows)
        if: matrix.os == 'windows-latest'
        shell: bash
        working-directory: "${{runner.workspace}}/build"
        run: |
-           ls -la D:/a/CDCVAM/build/DGtal/buildDGtal
-           cmake $GITHUB_WORKSPACE -DCMAKE_MODULE_PATH="D:/a/CDCVAM/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/CDCVAM/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+           conan install $GITHUB_WORKSPACE --build=missing
+           cmake $GITHUB_WORKSPACE -DCMAKE_POLICY_DEFAULT_CMP0091=NEW  -DCMAKE_MODULE_PATH="D:/a/CDCVAM/build/DGtal/buildDGtal" -DDGtal_DIR="D:/a/CDCVAM/build/DGtal/buildDGtal"  -DCMAKE_BUILD_TYPE=$BUILD_TYPE 
+
 
 
 
