@@ -57,7 +57,7 @@ int main(int argc, char *const *argv)
   app.add_option("--radius,-r", radius, "radius of accumulation analysis.", true);
   app.add_flag("--invertNormal", invertNormal, "export the accumulation vectors.");
   app.add_flag("--extractNoConf", extractNoConf, "extract even when no face is voting with a maximal score to the voxel (ie confidence equal to 0).");
-  auto optTh = app.add_option("--maxThAccVectors", thAcc, "threshold the value of accumulations used to decide to export the accumulations vectors (used with outputAccVectors) .", true);
+  auto optTh = app.add_option("--maxThAccVectors", thAcc, "threshold the value of accumulations used to decide to export the accumulations vectors (used with outputAccVectors). All voxel with accumulation greated or equal than the threshold are selected for output.", true);
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
