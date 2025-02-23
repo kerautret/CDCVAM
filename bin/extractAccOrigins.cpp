@@ -87,7 +87,7 @@ int main(int argc, char *const *argv)
      
       for(const auto &p: imageAccumulation.domain())
        {
-         if(imageAccumulation(p)>thAcc || optTh->count() == 0)
+         if(imageAccumulation(p) >= thAcc || optTh->count() == 0)
            {
              NormalAccumulator::PointIndexContainer setIndexPt = normAcc.getAssociatedIndexPoints(p);
 	     if (setIndexPt.size() != 0){
