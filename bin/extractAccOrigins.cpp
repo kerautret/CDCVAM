@@ -44,7 +44,7 @@ int main(int argc, char *const *argv)
   unsigned int thAcc {50};
   double radius {5.0};
   bool invertNormal {false};
-  
+  bool extractNoConf {false};
   
   // parse command line using CLI ----------------------------------------------
   CLI::App app;
@@ -54,10 +54,10 @@ int main(int argc, char *const *argv)
       ->required()
       ->check(CLI::ExistingFile);
   app.add_option("--output,-o,2",outputAccOrigins,"output accumulation origins.", true);
- 
   app.add_option("--radius,-r", radius, "radius of accumulation analysis.", true);
   app.add_flag("--invertNormal", invertNormal, "export the accumulation vectors.");
-  app.add_option("--maxThAccVectors", thAcc, "threshold the value of accumulations used to decide to export the accumulations vectors (used with outputAccVectors) .", true);
+  app.add_flag("--extractNoConf", extractNoConf, "extract even when no face is voting with a maximal score to the voxel (ie confidence equal to 0).");
+  auto optTh = app.add_option("--maxThAccVectors", thAcc, "threshold the value of accumulations used to decide to export the accumulations vectors (used with outputAccVectors). All voxel with accumulation greated or equal than the threshold are selected for output.", true);
   
   app.get_formatter()->column_width(40);
   CLI11_PARSE(app, argc, argv);
@@ -87,17 +87,20 @@ int main(int argc, char *const *argv)
      
       for(const auto &p: imageAccumulation.domain())
        {
-         if(imageAccumulation(p)>thAcc)
+         if(imageAccumulation(p) >= thAcc || optTh->count() == 0)
            {
              NormalAccumulator::PointIndexContainer setIndexPt = normAcc.getAssociatedIndexPoints(p);
-             if(setIndexPt.size()!=0){
-               fout << p[0] << " " << p[1] << " " << p[2] << " " << imageAccumulation(p) << " " << imageConfVote(p) << " ";
+	     if (setIndexPt.size() != 0){
+	       fout << p[0] << " " << p[1] << " " << p[2] << " " << imageAccumulation(p) << " " << imageConfVote(p) << " ";
                for(const auto &i: setIndexPt)
-                 {
-                   fout << i << " ";
-                 }
+	       {
+		 fout << i << " ";
+	       }
                fout << std::endl;
-             }
+	     }else if (extractNoConf){
+	       fout << p[0] << " " << p[1] << " " << p[2] << " " << imageAccumulation(p) << " " << imageConfVote(p);
+	       fout << std::endl;		      
+	     }
            }
        }
      fout.close();
